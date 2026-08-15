@@ -1,0 +1,26 @@
+{
+  "title": "การวิเคราะห์",
+  "summary": {
+    "totalTrades": "จำนวนเทรดทั้งหมด",
+    "winningTrades": "เทรดที่ชนะ",
+    "losingTrades": "เทรดที่แพ้",
+    "breakEvenTrades": "เทรดเท่าทุน",
+    "winRate": "อัตราชนะ",
+    "grossProfit": "กำไรรวม",
+    "grossLoss": "ขาดทุนรวม",
+    "netProfit": "กำไรสุทธิ",
+    "averageWin": "กำไรเฉลี่ย",
+    "averageLoss": "ขาดทุนเฉลี่ย",
+    "largestWin": "กำไรสูงสุด",
+    "largestLoss": "ขาดทุนสูงสุด",
+    "profitFactor": "Profit Factor",
+    "expectancy": "Expectancy",
+    "totalFees": "ค่าธรรมเนียมรวม",
+    "totalContracts": "จำนวนสัญญารวม"
+  },
+  "byInstrument": "ตามสัญญา",
+  "byDirection": "Long vs Short",
+  "byStrategy": "ตามกลยุทธ์",
+  "byDayOfWeek": "ตามวันในสัปดาห์",
+  "byMonth": "ตามเดือน"
+}

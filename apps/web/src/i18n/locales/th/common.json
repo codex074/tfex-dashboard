@@ -1,0 +1,61 @@
+{
+  "appName": "TFEX Trading Journal",
+  "nav": {
+    "dashboard": "แดชบอร์ด",
+    "portfolio": "พอร์ต",
+    "trades": "รายการเทรด",
+    "transactions": "ธุรกรรม",
+    "journal": "บันทึกการเทรด",
+    "cashFlow": "กระแสเงิน",
+    "analytics": "การวิเคราะห์",
+    "statements": "เอกสาร",
+    "settings": "ตั้งค่า"
+  },
+  "language": {
+    "thai": "ไทย",
+    "english": "English"
+  },
+  "transactionForm": {
+    "title": "บันทึกธุรกรรม",
+    "description": "บันทึกราคาเปิดสถานะ แล้วปิดสถานะจากหน้าแดชบอร์ด",
+    "required": "* จำเป็นต้องกรอก",
+    "fields": { "tradeDate": "วันที่เทรด", "instrumentFamily": "สินทรัพย์", "series": "Series", "broker": "Broker", "brokerReference": "เลขอ้างอิงโบรกเกอร์" },
+    "placeholders": { "instrument": "เลือกสินทรัพย์", "broker": "เลือก Broker" },
+    "submit": "เปิดสถานะ",
+    "saving": "กำลังบันทึก…",
+    "errors": { "duplicate": "มีธุรกรรมนี้อยู่แล้ว", "submit": "ไม่สามารถบันทึกธุรกรรมได้ กรุณาตรวจสอบข้อมูล" }
+  },
+  "settings": { "title": "ตั้งค่า", "contractSpecs": "สเปกสัญญา", "contractHelp": "กำหนด multiplier และ tick size ของสินทรัพย์", "brokerTerms": "เงื่อนไข Broker", "brokerHelp": "กำหนด margin และค่าธรรมเนียมตาม broker", "instrumentFamily": "สินทรัพย์", "multiplier": "บาทต่อจุด", "tickSize": "Tick size", "effectiveDate": "มีผลตั้งแต่", "broker": "Broker", "selectBroker": "เลือก Broker", "initialMargin": "Initial Margin", "maintenanceMargin": "Maintenance Margin", "commission": "Commission" },
+  "common": {
+    "loading": "กำลังโหลด…",
+    "error": "เกิดข้อผิดพลาด",
+    "empty": "ไม่มีข้อมูล",
+    "save": "บันทึก",
+    "cancel": "ยกเลิก",
+    "confirm": "ยืนยัน",
+    "add": "เพิ่ม",
+    "edit": "แก้ไข",
+    "delete": "ลบ",
+    "search": "ค้นหา",
+    "date": "วันที่",
+    "none": "ไม่มี",
+    "total": "รวม",
+    "account": "บัญชี",
+    "instrument": "สัญญา",
+    "direction": "ฝั่ง",
+    "long": "Long",
+    "short": "Short",
+    "status": "สถานะ",
+    "quantity": "จำนวน",
+    "price": "ราคา",
+    "fees": "ค่าธรรมเนียม",
+    "netPnl": "กำไร/ขาดทุนสุทธิ",
+    "grossPnl": "กำไร/ขาดทุนรวม",
+    "realizedPnl": "กำไร/ขาดทุนที่รับรู้แล้ว (Realized P/L)",
+    "unrealizedPnl": "กำไร/ขาดทุนที่ยังไม่รับรู้ (Unrealized P/L)",
+    "open": "เปิด",
+    "close": "ปิด",
+    "action": "รายการ",
+    "source": "แหล่งที่มา"
+  }
+}

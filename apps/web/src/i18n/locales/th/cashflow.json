@@ -1,0 +1,28 @@
+{
+  "title": "กระแสเงิน",
+  "deposit": "ฝากเงิน",
+  "withdraw": "ถอนเงิน",
+  "saving": "กำลังบันทึก…",
+  "saveError": "ไม่สามารถบันทึกรายการได้ กรุณาตรวจสอบข้อมูล",
+  "edit": "แก้ไขรายการ",
+  "actions": "จัดการ",
+  "confirmDelete": "ยืนยันการลบรายการนี้? การดำเนินการนี้ไม่สามารถย้อนกลับได้",
+  "types": {
+    "DEPOSIT": "ฝากเงิน",
+    "WITHDRAWAL": "ถอนเงิน",
+    "INTEREST": "ดอกเบี้ย",
+    "ADJUSTMENT": "ปรับปรุง"
+  },
+  "columns": {
+    "date": "วันที่",
+    "type": "ประเภท",
+    "amount": "จำนวนเงิน",
+    "reference": "อ้างอิง",
+    "note": "บันทึก"
+  },
+  "summary": {
+    "totalDeposits": "เงินฝากรวม",
+    "totalWithdrawals": "เงินถอนรวม",
+    "netCapitalFlow": "กระแสเงินสุทธิ"
+  }
+}

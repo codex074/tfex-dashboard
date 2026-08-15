@@ -1,0 +1,75 @@
+@import "tailwindcss";
+
+@theme {
+  --font-sans: "Montserrat", "Noto Sans Thai", "Noto Sans", Helvetica, Arial,
+    sans-serif;
+
+  /* Brand & accent */
+  --color-primary: #0866ff;
+  --color-primary-deep: #0143b5;
+  --color-primary-soft: #e9f0ff;
+  --color-fb-blue: #1877f2;
+  --color-meta-link: #0a55c4;
+
+  /* Surfaces */
+  --color-canvas: #ffffff;
+  --color-surface-soft: #f4f6f8;
+  --color-hairline: #e2e6ea;
+  --color-hairline-soft: #eceff2;
+
+  /* Text */
+  --color-ink-deep: #0a1317;
+  --color-ink: #1c2730;
+  --color-charcoal: #3d4752;
+  --color-slate: #5b6673;
+  --color-steel: #7d8895;
+  --color-stone: #a4adb8;
+
+  /* Semantic */
+  --color-success: #0a8f3c;
+  --color-success-soft: #e4f3eb;
+  --color-attention: #f59e0b;
+  --color-attention-soft: #fef3e2;
+  --color-warning: #ffd60a;
+  --color-critical: #dc2626;
+  --color-critical-soft: #fcecec;
+  --color-critical-strong: #b91c1c;
+
+  /* Button surfaces */
+  --color-ink-button: #0a1317;
+  --color-on-ink-button: #ffffff;
+  --color-on-primary: #ffffff;
+
+  /* Shapes */
+  --radius-xxxl: 32px;
+  --radius-feature: 40px;
+}
+
+:root {
+  color-scheme: light;
+}
+
+body {
+  margin: 0;
+  font-family: var(--font-sans);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  background-color: var(--color-canvas);
+  color: var(--color-ink-deep);
+  line-height: 1.5;
+  letter-spacing: -0.16px;
+}
+
+button:not(:disabled),
+a[href],
+[role="button"]:not([aria-disabled="true"]) {
+  cursor: pointer;
+}
+
+button:disabled {
+  cursor: not-allowed;
+}
+
+#root {
+  min-height: 100vh;
+}

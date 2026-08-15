@@ -1,0 +1,26 @@
+{
+  "title": "Analytics",
+  "summary": {
+    "totalTrades": "Total Trades",
+    "winningTrades": "Winning Trades",
+    "losingTrades": "Losing Trades",
+    "breakEvenTrades": "Break-even Trades",
+    "winRate": "Win Rate",
+    "grossProfit": "Gross Profit",
+    "grossLoss": "Gross Loss",
+    "netProfit": "Net Profit",
+    "averageWin": "Average Win",
+    "averageLoss": "Average Loss",
+    "largestWin": "Largest Win",
+    "largestLoss": "Largest Loss",
+    "profitFactor": "Profit Factor",
+    "expectancy": "Expectancy",
+    "totalFees": "Total Fees",
+    "totalContracts": "Total Contracts"
+  },
+  "byInstrument": "By Instrument",
+  "byDirection": "Long vs Short",
+  "byStrategy": "By Strategy",
+  "byDayOfWeek": "By Day of Week",
+  "byMonth": "By Month"
+}

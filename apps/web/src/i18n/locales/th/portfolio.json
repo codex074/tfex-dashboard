@@ -1,0 +1,19 @@
+{
+  "title": "พอร์ต",
+  "cards": {
+    "currentEquity": "มูลค่าพอร์ตปัจจุบัน",
+    "cashBalance": "เงินสดคงเหลือ",
+    "openPositions": "สถานะเปิด",
+    "unrealizedPnl": "กำไร/ขาดทุนที่ยังไม่รับรู้ (Unrealized P/L)",
+    "marginUsed": "หลักประกันที่ใช้",
+    "excessEquity": "เงินส่วนเกิน"
+  },
+  "positionTable": {
+    "instrument": "สัญญา",
+    "direction": "ฝั่ง",
+    "quantity": "จำนวน",
+    "averagePrice": "ราคาเฉลี่ย",
+    "marketPrice": "ราคาตลาด",
+    "unrealizedPnl": "กำไร/ขาดทุนที่ยังไม่รับรู้ (Unrealized P/L)"
+  }
+}

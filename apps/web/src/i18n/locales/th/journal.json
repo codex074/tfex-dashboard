@@ -1,0 +1,20 @@
+{
+  "title": "บันทึกการเทรด",
+  "fields": {
+    "strategy": "กลยุทธ์",
+    "setup": "Setup",
+    "timeframe": "Timeframe",
+    "entryReason": "เหตุผลเข้า",
+    "exitReason": "เหตุผลออก",
+    "confidence": "ความมั่นใจ",
+    "emotion": "อารมณ์",
+    "followedPlan": "ทำตามแผน",
+    "mistakes": "ข้อผิดพลาด",
+    "lessons": "บทเรียน",
+    "thingsDoneWell": "สิ่งที่ทำได้ดี",
+    "improvements": "สิ่งที่ต้องปรับปรุง",
+    "preTradeNote": "บันทึกก่อนเทรด",
+    "postTradeNote": "บันทึกหลังเทรด",
+    "tags": "แท็ก"
+  }
+}

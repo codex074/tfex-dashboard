@@ -1,0 +1,20 @@
+{
+  "title": "Trading Journal",
+  "fields": {
+    "strategy": "Strategy",
+    "setup": "Setup",
+    "timeframe": "Timeframe",
+    "entryReason": "Entry Reason",
+    "exitReason": "Exit Reason",
+    "confidence": "Confidence",
+    "emotion": "Emotion",
+    "followedPlan": "Followed Plan",
+    "mistakes": "Mistakes",
+    "lessons": "Lessons",
+    "thingsDoneWell": "Things Done Well",
+    "improvements": "Improvements",
+    "preTradeNote": "Pre-Trade Note",
+    "postTradeNote": "Post-Trade Note",
+    "tags": "Tags"
+  }
+}

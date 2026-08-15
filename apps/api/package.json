@@ -1,0 +1,36 @@
+{
+  "name": "@tfex/api",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "tsx watch src/server.ts",
+    "start": "tsx src/server.ts",
+    "build": "tsc",
+    "typecheck": "tsc --noEmit",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "db:generate": "drizzle-kit generate",
+    "db:migrate": "drizzle-kit migrate",
+    "db:seed": "tsx src/db/seed.ts",
+    "backup": "tsx src/db/backup.ts"
+  },
+  "dependencies": {
+    "@fastify/cors": "^10.0.1",
+    "@fastify/multipart": "^9.0.3",
+    "@tfex/shared": "workspace:*",
+    "better-sqlite3": "^11.5.0",
+    "dotenv": "^16.4.5",
+    "drizzle-orm": "^0.36.4",
+    "fastify": "^5.1.0",
+    "zod": "^3.23.8"
+  },
+  "devDependencies": {
+    "@types/better-sqlite3": "^7.6.11",
+    "@types/node": "^22.10.1",
+    "drizzle-kit": "^0.28.1",
+    "tsx": "^4.19.2",
+    "typescript": "^5.6.3",
+    "vitest": "^2.1.8"
+  }
+}

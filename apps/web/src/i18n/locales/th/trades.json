@@ -1,0 +1,39 @@
+{
+  "title": "รายการเทรด",
+  "filters": {
+    "search": "ค้นหา",
+    "dateRange": "ช่วงวันที่",
+    "instrument": "สัญญา",
+    "direction": "ฝั่ง",
+    "status": "สถานะ",
+    "strategy": "กลยุทธ์",
+    "winLoss": "ชนะ/แพ้",
+    "all": "ทั้งหมด"
+  },
+  "columns": {
+    "openDate": "วันที่เปิด",
+    "closeDate": "วันที่ปิด",
+    "instrument": "สัญญา",
+    "direction": "ฝั่ง",
+    "quantity": "จำนวน",
+    "averageEntry": "ราคาเข้าเฉลี่ย",
+    "averageExit": "ราคาออกเฉลี่ย",
+    "grossPnl": "กำไร/ขาดทุนรวม",
+    "fees": "ค่าธรรมเนียม",
+    "netPnl": "กำไร/ขาดทุนสุทธิ",
+    "strategy": "กลยุทธ์",
+    "status": "สถานะ"
+  },
+  "status": {
+    "OPEN": "เปิด",
+    "PARTIAL": "ปิดบางส่วน",
+    "CLOSED": "ปิดแล้ว"
+  },
+  "detail": {
+    "title": "รายละเอียดเทรด",
+    "summary": "สรุปเทรด",
+    "transactions": "ธุรกรรม",
+    "journal": "บันทึก",
+    "addTrade": "เพิ่มรายการเทรด"
+  }
+}

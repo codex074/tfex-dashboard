@@ -1,0 +1,35 @@
+{
+  "title": "แดชบอร์ด",
+  "cards": {
+    "portfolioEquity": "มูลค่าพอร์ต",
+    "cashBalance": "เงินสดคงเหลือ",
+    "netTradingPnl": "กำไร/ขาดทุนสุทธิ",
+    "realizedPnl": "กำไร/ขาดทุนที่รับรู้แล้ว (Realized P/L)",
+    "unrealizedPnl": "กำไร/ขาดทุนที่ยังไม่รับรู้ (Unrealized P/L)",
+    "totalDeposits": "เงินฝากรวม",
+    "totalWithdrawals": "เงินถอนรวม",
+    "netCapitalFlow": "กระแสเงินสุทธิ",
+    "totalFees": "ค่าธรรมเนียมรวม",
+    "winRate": "อัตราชนะ",
+    "profitFactor": "Profit Factor",
+    "expectancy": "Expectancy",
+    "totalTrades": "จำนวนเทรด",
+    "maxDrawdown": "Drawdown สูงสุด",
+    "currentDrawdown": "Drawdown ปัจจุบัน"
+    ,"notionalExposure": "มูลค่า Exposure", "effectiveLeverage": "Effective Leverage", "marginUsed": "หลักประกันที่ใช้", "marginUtilization": "การใช้หลักประกัน"
+  },
+  "equityCurve": "Equity Curve",
+  "netCapitalFlowCurve": "กระแสเงินสุทธิ",
+  "monthlyPerformance": "ผลกำไรรายเดือน",
+  "longVsShort": "Long vs Short",
+  "strategyPerformance": "ผลการดำเนินงานตามกลยุทธ์",
+  "winLossStats": "สถิติชนะ/แพ้",
+  "openPositions": "สถานะที่เปิดอยู่",
+  "noOpenPositions": "ไม่มีสถานะที่เปิดอยู่",
+  "entryPrice": "ราคาเข้า",
+  "closePosition": "ปิดสถานะ",
+  "closePrice": "ราคาปิด",
+  "closeDate": "วันที่ปิดสถานะ",
+  "confirmClose": "ยืนยันปิดสถานะ",
+  "closeError": "ไม่สามารถปิดสถานะได้ กรุณาตรวจสอบราคา"
+}

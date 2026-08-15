@@ -1,0 +1,35 @@
+{
+  "title": "Dashboard",
+  "cards": {
+    "portfolioEquity": "Portfolio Equity",
+    "cashBalance": "Cash Balance",
+    "netTradingPnl": "Net Trading P/L",
+    "realizedPnl": "Realized P/L",
+    "unrealizedPnl": "Unrealized P/L",
+    "totalDeposits": "Total Deposits",
+    "totalWithdrawals": "Total Withdrawals",
+    "netCapitalFlow": "Net Capital Flow",
+    "totalFees": "Total Fees",
+    "winRate": "Win Rate",
+    "profitFactor": "Profit Factor",
+    "expectancy": "Expectancy",
+    "totalTrades": "Total Trades",
+    "maxDrawdown": "Maximum Drawdown",
+    "currentDrawdown": "Current Drawdown"
+    ,"notionalExposure": "Notional Exposure", "effectiveLeverage": "Effective Leverage", "marginUsed": "Margin Used", "marginUtilization": "Margin Utilization"
+  },
+  "equityCurve": "Equity Curve",
+  "netCapitalFlowCurve": "Net Capital Flow",
+  "monthlyPerformance": "Monthly P/L",
+  "longVsShort": "Long vs Short",
+  "strategyPerformance": "Strategy Performance",
+  "winLossStats": "Win/Loss Statistics",
+  "openPositions": "Open Positions",
+  "noOpenPositions": "No open positions",
+  "entryPrice": "Entry price",
+  "closePosition": "Close position",
+  "closePrice": "Close price",
+  "closeDate": "Close date",
+  "confirmClose": "Confirm close",
+  "closeError": "Unable to close this position. Please check the price."
+}

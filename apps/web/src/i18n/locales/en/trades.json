@@ -1,0 +1,39 @@
+{
+  "title": "Trades",
+  "filters": {
+    "search": "Search",
+    "dateRange": "Date Range",
+    "instrument": "Instrument",
+    "direction": "Direction",
+    "status": "Status",
+    "strategy": "Strategy",
+    "winLoss": "Win/Loss",
+    "all": "All"
+  },
+  "columns": {
+    "openDate": "Open Date",
+    "closeDate": "Close Date",
+    "instrument": "Instrument",
+    "direction": "Direction",
+    "quantity": "Quantity",
+    "averageEntry": "Avg Entry",
+    "averageExit": "Avg Exit",
+    "grossPnl": "Gross P/L",
+    "fees": "Fees",
+    "netPnl": "Net P/L",
+    "strategy": "Strategy",
+    "status": "Status"
+  },
+  "status": {
+    "OPEN": "Open",
+    "PARTIAL": "Partial",
+    "CLOSED": "Closed"
+  },
+  "detail": {
+    "title": "Trade Detail",
+    "summary": "Trade Summary",
+    "transactions": "Transactions",
+    "journal": "Journal",
+    "addTrade": "Add Trade"
+  }
+}

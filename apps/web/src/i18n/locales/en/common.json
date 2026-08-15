@@ -1,0 +1,61 @@
+{
+  "appName": "TFEX Trading Journal",
+  "nav": {
+    "dashboard": "Dashboard",
+    "portfolio": "Portfolio",
+    "trades": "Trades",
+    "transactions": "Transactions",
+    "journal": "Journal",
+    "cashFlow": "Cash Flow",
+    "analytics": "Analytics",
+    "statements": "Statements",
+    "settings": "Settings"
+  },
+  "language": {
+    "thai": "ไทย",
+    "english": "English"
+  },
+  "transactionForm": {
+    "title": "Record transaction",
+    "description": "Record an opening position, then close it from the dashboard.",
+    "required": "* Required",
+    "fields": { "tradeDate": "Trade date", "instrumentFamily": "Instrument", "series": "Series", "broker": "Broker", "brokerReference": "Broker reference" },
+    "placeholders": { "instrument": "Select instrument", "broker": "Select broker" },
+    "submit": "Open position",
+    "saving": "Saving…",
+    "errors": { "duplicate": "This transaction already exists.", "submit": "Unable to save the transaction. Please check the details." }
+  },
+  "settings": { "title": "Settings", "contractSpecs": "Contract specs", "contractHelp": "Set the multiplier and tick size for each instrument.", "brokerTerms": "Broker terms", "brokerHelp": "Set margin and fee defaults per broker.", "instrumentFamily": "Instrument", "multiplier": "THB per point", "tickSize": "Tick size", "effectiveDate": "Effective from", "broker": "Broker", "selectBroker": "Select broker", "initialMargin": "Initial margin", "maintenanceMargin": "Maintenance margin", "commission": "Commission" },
+  "common": {
+    "loading": "Loading…",
+    "error": "Something went wrong",
+    "empty": "No data",
+    "save": "Save",
+    "cancel": "Cancel",
+    "confirm": "Confirm",
+    "add": "Add",
+    "edit": "Edit",
+    "delete": "Delete",
+    "search": "Search",
+    "date": "Date",
+    "none": "None",
+    "total": "Total",
+    "account": "Account",
+    "instrument": "Instrument",
+    "direction": "Direction",
+    "long": "Long",
+    "short": "Short",
+    "status": "Status",
+    "quantity": "Quantity",
+    "price": "Price",
+    "fees": "Fees",
+    "netPnl": "Net P/L",
+    "grossPnl": "Gross P/L",
+    "realizedPnl": "Realized P/L",
+    "unrealizedPnl": "Unrealized P/L",
+    "open": "Open",
+    "close": "Close",
+    "action": "Action",
+    "source": "Source"
+  }
+}

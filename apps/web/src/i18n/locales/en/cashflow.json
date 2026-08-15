@@ -1,0 +1,28 @@
+{
+  "title": "Cash Flow",
+  "deposit": "Deposit",
+  "withdraw": "Withdraw",
+  "saving": "Saving…",
+  "saveError": "Unable to save the transaction. Please check the details.",
+  "edit": "Edit transaction",
+  "actions": "Actions",
+  "confirmDelete": "Delete this transaction? This action cannot be undone.",
+  "types": {
+    "DEPOSIT": "Deposit",
+    "WITHDRAWAL": "Withdrawal",
+    "INTEREST": "Interest",
+    "ADJUSTMENT": "Adjustment"
+  },
+  "columns": {
+    "date": "Date",
+    "type": "Type",
+    "amount": "Amount",
+    "reference": "Reference",
+    "note": "Note"
+  },
+  "summary": {
+    "totalDeposits": "Total Deposits",
+    "totalWithdrawals": "Total Withdrawals",
+    "netCapitalFlow": "Net Capital Flow"
+  }
+}
