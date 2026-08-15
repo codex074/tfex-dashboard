@@ -15,8 +15,9 @@
     "expectancy": "Expectancy",
     "totalTrades": "Total Trades",
     "maxDrawdown": "Maximum Drawdown",
-    "currentDrawdown": "Current Drawdown"
-    ,"notionalExposure": "Notional Exposure", "effectiveLeverage": "Effective Leverage", "marginUsed": "Margin Used", "marginUtilization": "Margin Utilization"
+    "currentDrawdown": "Current Drawdown",
+    "depositsWithdrawals": "Total Deposits / Withdrawals",
+    "notionalExposure": "Notional Exposure", "effectiveLeverage": "Effective Leverage", "marginUsed": "Margin Used", "marginUtilization": "Margin Utilization"
   },
   "equityCurve": "Equity Curve",
   "netCapitalFlowCurve": "Net Capital Flow",

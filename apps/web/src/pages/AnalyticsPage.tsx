@@ -1,10 +1,11 @@
 import { useQuery } from "@tanstack/react-query";
 import { useTranslation } from "react-i18next";
 import { api, type AnalyticsSummary, type GroupedMetric } from "../services/api";
-import { useActiveAccountId } from "../hooks/useAccounts";
+import { useAccounts, useActiveAccountId } from "../hooks/useAccounts";
 import {
   ErrorState,
   Loading,
+  NoAccountState,
   PageTitle,
   PnlText,
   ProfitFactorText,
@@ -14,6 +15,7 @@ import { formatMoney, formatPercent, formatNumber } from "../utils/format";
 
 export function AnalyticsPage() {
   const { t, i18n } = useTranslation();
+  const accounts = useAccounts();
   const accountId = useActiveAccountId();
   const lang = i18n.language.startsWith("th") ? "th" : "en";
 
@@ -38,6 +40,12 @@ export function AnalyticsPage() {
     enabled: accountId !== undefined,
   });
 
+  if (accountId === undefined && accounts.isLoading) {
+    return <Loading label={t("common.loading")} />;
+  }
+  if (accountId === undefined) {
+    return <NoAccountState />;
+  }
   if (summary.isLoading) {
     return <Loading label={t("common.loading")} />;
   }

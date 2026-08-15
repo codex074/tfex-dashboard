@@ -15,8 +15,9 @@
     "expectancy": "Expectancy",
     "totalTrades": "จำนวนเทรด",
     "maxDrawdown": "Drawdown สูงสุด",
-    "currentDrawdown": "Drawdown ปัจจุบัน"
-    ,"notionalExposure": "มูลค่า Exposure", "effectiveLeverage": "Effective Leverage", "marginUsed": "หลักประกันที่ใช้", "marginUtilization": "การใช้หลักประกัน"
+    "currentDrawdown": "Drawdown ปัจจุบัน",
+    "depositsWithdrawals": "เงินฝากรวม / เงินถอนรวม",
+    "notionalExposure": "มูลค่า Exposure", "effectiveLeverage": "Effective Leverage", "marginUsed": "หลักประกันที่ใช้", "marginUtilization": "การใช้หลักประกัน"
   },
   "equityCurve": "Equity Curve",
   "netCapitalFlowCurve": "กระแสเงินสุทธิ",

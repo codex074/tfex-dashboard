@@ -1,11 +1,12 @@
 import { useQuery } from "@tanstack/react-query";
 import { useTranslation } from "react-i18next";
 import { api, type AccountSummary, type Position } from "../services/api";
-import { useActiveAccountId } from "../hooks/useAccounts";
+import { useAccounts, useActiveAccountId } from "../hooks/useAccounts";
 import {
   DirectionBadge,
   ErrorState,
   Loading,
+  NoAccountState,
   PageTitle,
   PnlText,
   StatCard,
@@ -14,6 +15,7 @@ import { formatMoney, formatPrice, formatNumber } from "../utils/format";
 
 export function PortfolioPage() {
   const { t, i18n } = useTranslation();
+  const accounts = useAccounts();
   const accountId = useActiveAccountId();
   const lang = i18n.language.startsWith("th") ? "th" : "en";
 
@@ -29,6 +31,12 @@ export function PortfolioPage() {
     enabled: accountId !== undefined,
   });
 
+  if (accountId === undefined && accounts.isLoading) {
+    return <Loading label={t("common.loading")} />;
+  }
+  if (accountId === undefined) {
+    return <NoAccountState />;
+  }
   if (account.isLoading) {
     return <Loading label={t("common.loading")} />;
   }

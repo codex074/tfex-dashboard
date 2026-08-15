@@ -1,4 +1,5 @@
 import type { ReactNode } from "react";
+import { Link } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import { formatMoney, formatPercent, formatProfitFactor } from "../utils/format";
 
@@ -171,6 +172,21 @@ export function ErrorState({ message }: { message: string }) {
   return (
     <div className="rounded-xl border border-critical-strong bg-critical-soft p-4 text-sm text-critical-strong">
       {message}
+    </div>
+  );
+}
+
+export function NoAccountState() {
+  const { t } = useTranslation();
+  return (
+    <div className="rounded-xxxl border border-hairline-soft bg-canvas p-10 text-center">
+      <p className="text-base text-ink">{t("common.noAccount")}</p>
+      <Link
+        to="/settings"
+        className="mt-4 inline-block rounded-full bg-ink-deep px-5 py-2.5 text-sm font-bold text-canvas transition-colors hover:bg-charcoal"
+      >
+        {t("common.goToSettings")}
+      </Link>
     </div>
   );
 }

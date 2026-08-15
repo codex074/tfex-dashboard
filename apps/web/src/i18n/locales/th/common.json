@@ -26,10 +26,21 @@
     "errors": { "duplicate": "มีธุรกรรมนี้อยู่แล้ว", "submit": "ไม่สามารถบันทึกธุรกรรมได้ กรุณาตรวจสอบข้อมูล" }
   },
   "settings": { "title": "ตั้งค่า", "contractSpecs": "สเปกสัญญา", "contractHelp": "กำหนด multiplier และ tick size ของสินทรัพย์", "brokerTerms": "เงื่อนไข Broker", "brokerHelp": "กำหนด margin และค่าธรรมเนียมตาม broker", "instrumentFamily": "สินทรัพย์", "multiplier": "บาทต่อจุด", "tickSize": "Tick size", "effectiveDate": "มีผลตั้งแต่", "broker": "Broker", "selectBroker": "เลือก Broker", "initialMargin": "Initial Margin", "maintenanceMargin": "Maintenance Margin", "commission": "Commission" },
+  "account": {
+    "title": "บัญชีเทรด",
+    "help": "สร้างบัญชีเทรดของคุณเพื่อเริ่มบันทึกการเทรด",
+    "name": "ชื่อบัญชี",
+    "accountNumber": "เลขที่บัญชี",
+    "initialCapital": "เงินทุนเริ่มต้น (บาท)",
+    "create": "สร้างบัญชี",
+    "creating": "กำลังสร้าง…"
+  },
   "common": {
     "loading": "กำลังโหลด…",
     "error": "เกิดข้อผิดพลาด",
     "empty": "ไม่มีข้อมูล",
+    "noAccount": "สร้างบัญชีเทรดแรกของคุณเพื่อเริ่มต้นใช้งาน",
+    "goToSettings": "ไปที่ตั้งค่า",
     "save": "บันทึก",
     "cancel": "ยกเลิก",
     "confirm": "ยืนยัน",

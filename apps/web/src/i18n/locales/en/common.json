@@ -26,10 +26,21 @@
     "errors": { "duplicate": "This transaction already exists.", "submit": "Unable to save the transaction. Please check the details." }
   },
   "settings": { "title": "Settings", "contractSpecs": "Contract specs", "contractHelp": "Set the multiplier and tick size for each instrument.", "brokerTerms": "Broker terms", "brokerHelp": "Set margin and fee defaults per broker.", "instrumentFamily": "Instrument", "multiplier": "THB per point", "tickSize": "Tick size", "effectiveDate": "Effective from", "broker": "Broker", "selectBroker": "Select broker", "initialMargin": "Initial margin", "maintenanceMargin": "Maintenance margin", "commission": "Commission" },
+  "account": {
+    "title": "Trading account",
+    "help": "Create your trading account to start recording trades.",
+    "name": "Account name",
+    "accountNumber": "Account number",
+    "initialCapital": "Initial capital (THB)",
+    "create": "Create account",
+    "creating": "Creating…"
+  },
   "common": {
     "loading": "Loading…",
     "error": "Something went wrong",
     "empty": "No data",
+    "noAccount": "Create your first trading account to get started.",
+    "goToSettings": "Go to Settings",
     "save": "Save",
     "cancel": "Cancel",
     "confirm": "Confirm",

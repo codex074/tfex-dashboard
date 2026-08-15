@@ -2,11 +2,12 @@ import { type FormEvent, useState } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useTranslation } from "react-i18next";
 import { api, type CashTransaction, type CashFlowSummary } from "../services/api";
-import { useActiveAccountId } from "../hooks/useAccounts";
+import { useAccounts, useActiveAccountId } from "../hooks/useAccounts";
 import {
   Badge,
   ErrorState,
   Loading,
+  NoAccountState,
   PageTitle,
   StatCard,
 } from "../components/ui";
@@ -21,6 +22,7 @@ const typeTone: Record<string, "success" | "critical" | "attention" | "neutral">
 
 export function CashFlowPage() {
   const { t, i18n } = useTranslation();
+  const accounts = useAccounts();
   const accountId = useActiveAccountId();
   const queryClient = useQueryClient();
   const lang = i18n.language.startsWith("th") ? "th" : "en";
@@ -61,6 +63,12 @@ export function CashFlowPage() {
     enabled: accountId !== undefined,
   });
 
+  if (accountId === undefined && accounts.isLoading) {
+    return <Loading label={t("common.loading")} />;
+  }
+  if (accountId === undefined) {
+    return <NoAccountState />;
+  }
   if (summary.isLoading) {
     return <Loading label={t("common.loading")} />;
   }

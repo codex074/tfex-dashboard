@@ -11,8 +11,8 @@ import {
   YAxis,
 } from "recharts";
 import { api, type DashboardSummary, type EquityCurve, type Trade } from "../services/api";
-import { useActiveAccountId } from "../hooks/useAccounts";
-import { DirectionBadge, ErrorState, Loading, StatCard, PageTitle } from "../components/ui";
+import { useAccounts, useActiveAccountId } from "../hooks/useAccounts";
+import { DirectionBadge, ErrorState, Loading, NoAccountState, StatCard, PageTitle } from "../components/ui";
 import {
   formatMoney,
   formatPercent,
@@ -24,6 +24,7 @@ import {
 
 export function DashboardPage() {
   const { t, i18n } = useTranslation();
+  const accounts = useAccounts();
   const accountId = useActiveAccountId();
   const queryClient = useQueryClient();
   const lang = i18n.language.startsWith("th") ? "th" : "en";
@@ -57,6 +58,12 @@ export function DashboardPage() {
     onSuccess: () => { void queryClient.invalidateQueries({ queryKey: ["open-trades", accountId] }); void queryClient.invalidateQueries({ queryKey: ["dashboard-summary", accountId] }); setClosingTrade(null); setClosePrice(""); setCloseFee(""); },
   });
 
+  if (accountId === undefined && accounts.isLoading) {
+    return <Loading label={t("common.loading")} />;
+  }
+  if (accountId === undefined) {
+    return <NoAccountState />;
+  }
   if (summary.isLoading || equity.isLoading) {
     return <Loading label={t("common.loading")} />;
   }
@@ -65,6 +72,9 @@ export function DashboardPage() {
   }
 
   const s = summary.data;
+  const totalDepositsNum = Number(s.totalDeposits);
+  const depositPct =
+    totalDepositsNum > 0 ? Number(s.netTradingPnl) / totalDepositsNum : null;
   const chartData =
     equity.data?.points.map((p) => ({
       date: p.date,
@@ -83,15 +93,25 @@ export function DashboardPage() {
         />
         <StatCard
           label={t("dashboard.cards.netTradingPnl")}
-          value={formatMoney(s.netTradingPnl, lang)}
+          value={
+            <>
+              {formatMoney(s.netTradingPnl, lang)}
+              {depositPct !== null ? (
+                <span
+                  className={`ml-2 text-base font-medium ${
+                    depositPct >= 0 ? "text-success" : "text-critical"
+                  }`}
+                >
+                  ({formatPercent(depositPct, lang)})
+                </span>
+              ) : null}
+            </>
+          }
         />
         <StatCard
-          label={t("dashboard.cards.totalDeposits")}
+          label={t("dashboard.cards.depositsWithdrawals")}
           value={formatMoney(s.totalDeposits, lang)}
-        />
-        <StatCard
-          label={t("dashboard.cards.totalWithdrawals")}
-          value={formatMoney(s.totalWithdrawals, lang)}
+          hint={`${t("dashboard.cards.totalWithdrawals")}: ${formatMoney(s.totalWithdrawals, lang)}`}
         />
         <StatCard
           label={t("dashboard.cards.winRate")}

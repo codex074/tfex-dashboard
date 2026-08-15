@@ -1,12 +1,13 @@
 import { type FormEvent, type ReactNode, useState } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useTranslation } from "react-i18next";
-import { api, ApiClientError, type Broker, type BrokerTransaction, type InstrumentContractSpec } from "../services/api";
-import { useActiveAccountId } from "../hooks/useAccounts";
+import { api, ApiClientError, type BrokerTransaction } from "../services/api";
+import { useAccounts, useActiveAccountId } from "../hooks/useAccounts";
 import {
   DirectionBadge,
   ErrorState,
   Loading,
+  NoAccountState,
   PageTitle,
   PnlText,
 } from "../components/ui";
@@ -14,14 +15,13 @@ import { formatMoney, formatPrice, formatDate, formatNumber } from "../utils/for
 
 export function TransactionsPage() {
   const { t, i18n } = useTranslation();
+  const accounts = useAccounts();
   const accountId = useActiveAccountId();
   const queryClient = useQueryClient();
   const lang = i18n.language.startsWith("th") ? "th" : "en";
   const [form, setForm] = useState({
     tradeDate: new Date().toISOString().slice(0, 10),
-    instrumentFamily: "",
-    series: "",
-    brokerId: "",
+    instrument: "",
     side: "LONG",
     quantity: "1",
     price: "",
@@ -37,12 +37,11 @@ export function TransactionsPage() {
       return api.post<BrokerTransaction>("/trades/open-position", {
         accountId,
         tradeDate: form.tradeDate,
-        instrument: `${form.instrumentFamily}${form.series.trim().toUpperCase()}`,
-        instrumentFamily: form.instrumentFamily,
-        brokerId: form.brokerId ? Number(form.brokerId) : undefined,
+        instrument: form.instrument.trim(),
         side: form.side,
         quantity: Number(form.quantity),
         price: form.price,
+        totalFee: form.totalFee || null,
         brokerReference: form.brokerReference.trim() || null,
       });
     },
@@ -50,10 +49,10 @@ export function TransactionsPage() {
       void queryClient.invalidateQueries({ queryKey: ["transactions", accountId] });
       setForm((current) => ({
         ...current,
-        instrumentFamily: "",
-        series: "",
+        instrument: "",
         quantity: "1",
         price: "",
+        totalFee: "",
         brokerReference: "",
       }));
     },
@@ -82,9 +81,13 @@ export function TransactionsPage() {
       api.get<BrokerTransaction[]>("/transactions", { accountId, limit: 500 }),
     enabled: accountId !== undefined,
   });
-  const contractSpecs = useQuery({ queryKey: ["contract-specs"], queryFn: () => api.get<InstrumentContractSpec[]>("/instrument-contract-specs") });
-  const brokers = useQuery({ queryKey: ["brokers"], queryFn: () => api.get<Broker[]>("/brokers") });
 
+  if (accountId === undefined && accounts.isLoading) {
+    return <Loading label={t("common.loading")} />;
+  }
+  if (accountId === undefined) {
+    return <NoAccountState />;
+  }
   if (transactions.isLoading) {
     return <Loading label={t("common.loading")} />;
   }
@@ -112,20 +115,8 @@ export function TransactionsPage() {
           <Field label={t("transactionForm.fields.tradeDate")} required>
             <input className={inputClassName} type="date" value={form.tradeDate} onChange={(event) => updateForm("tradeDate", event.target.value)} required />
           </Field>
-          <Field label={t("transactionForm.fields.instrumentFamily")} required>
-            <select className={inputClassName} value={form.instrumentFamily} onChange={(event) => updateForm("instrumentFamily", event.target.value)} required>
-              <option value="">{t("transactionForm.placeholders.instrument")}</option>
-              {(contractSpecs.data ?? []).filter((spec, index, all) => all.findIndex((item) => item.instrumentFamily === spec.instrumentFamily) === index).map((spec) => <option key={spec.id} value={spec.instrumentFamily}>{spec.instrumentFamily}</option>)}
-            </select>
-          </Field>
-          <Field label={t("transactionForm.fields.series")} required>
-            <input className={inputClassName} value={form.series} onChange={(event) => updateForm("series", event.target.value.toUpperCase())} placeholder="U26" required />
-          </Field>
-          <Field label={t("transactionForm.fields.broker")} required>
-            <select className={inputClassName} value={form.brokerId} onChange={(event) => updateForm("brokerId", event.target.value)} required>
-              <option value="">{t("transactionForm.placeholders.broker")}</option>
-              {(brokers.data ?? []).map((broker) => <option key={broker.id} value={broker.id}>{broker.name}</option>)}
-            </select>
+          <Field label={t("common.instrument")} required>
+            <input className={inputClassName} value={form.instrument} onChange={(event) => updateForm("instrument", event.target.value)} placeholder={t("transactionForm.placeholders.instrument")} required />
           </Field>
           <Field label={t("common.direction")} required>
             <select className={inputClassName} value={form.side} onChange={(event) => updateForm("side", event.target.value)}>
@@ -138,6 +129,9 @@ export function TransactionsPage() {
           </Field>
           <Field label={t("common.price")} required>
             <input className={inputClassName} type="number" min="0.01" step="0.01" inputMode="decimal" value={form.price} onChange={(event) => updateForm("price", event.target.value)} required />
+          </Field>
+          <Field label={t("common.fees")}>
+            <input className={inputClassName} type="number" min="0" step="0.01" inputMode="decimal" value={form.totalFee} onChange={(event) => updateForm("totalFee", event.target.value)} placeholder="0.00" />
           </Field>
           <Field label={t("transactionForm.fields.brokerReference")} className="md:col-span-2">
             <input className={inputClassName} value={form.brokerReference} onChange={(event) => updateForm("brokerReference", event.target.value)} />
