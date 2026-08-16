@@ -19,15 +19,18 @@ import {
   toCashTransactionDto,
   updateCashTransaction,
 } from "../services/transaction.service.js";
+import { requireUser } from "./auth.routes.js";
 
 export function registerAccountRoutes(app: FastifyInstance, db: Db) {
-  app.get("/api/accounts", async () => {
-    return { data: listAccounts(db).map(toAccountDto) };
+  app.get("/api/accounts", async (request) => {
+    const user = requireUser(request);
+    return { data: listAccounts(db, user.role === "ADMIN" ? undefined : user.id).map(toAccountDto) };
   });
 
   app.post("/api/accounts", async (request) => {
     const parsed = createAccountSchema.parse(request.body);
-    return { data: toAccountDto(createAccount(db, parsed)) };
+    const user = requireUser(request);
+    return { data: toAccountDto(createAccount(db, { ...parsed, userId: user.id === 0 ? undefined : user.id })) };
   });
 
   app.get("/api/accounts/:id", async (request, reply) => {

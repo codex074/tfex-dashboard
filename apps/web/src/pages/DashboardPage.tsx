@@ -1,10 +1,11 @@
-import { useState } from "react";
+import { useState, type ReactNode } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useTranslation } from "react-i18next";
 import {
   Area,
   AreaChart,
   CartesianGrid,
+  LabelList,
   ResponsiveContainer,
   Tooltip,
   XAxis,
@@ -12,7 +13,7 @@ import {
 } from "recharts";
 import { api, type DashboardSummary, type EquityCurve, type Trade } from "../services/api";
 import { useAccounts, useActiveAccountId } from "../hooks/useAccounts";
-import { DirectionBadge, ErrorState, Loading, NoAccountState, StatCard, PageTitle } from "../components/ui";
+import { DirectionBadge, ErrorState, Loading, NoAccountState, PageTitle } from "../components/ui";
 import {
   formatMoney,
   formatPercent,
@@ -85,55 +86,48 @@ export function DashboardPage() {
     <div className="space-y-10">
       <PageTitle title={t("dashboard.title")} />
 
-      <div className="grid grid-cols-2 gap-6 md:grid-cols-3 xl:grid-cols-4">
-        <StatCard
-          label={t("dashboard.cards.portfolioEquity")}
-          value={formatMoney(s.portfolioEquity, lang)}
-          accent
-        />
-        <StatCard
-          label={t("dashboard.cards.netTradingPnl")}
-          value={
-            <>
-              {formatMoney(s.netTradingPnl, lang)}
-              {depositPct !== null ? (
-                <span
-                  className={`ml-2 text-base font-medium ${
-                    depositPct >= 0 ? "text-success" : "text-critical"
-                  }`}
-                >
-                  ({formatPercent(depositPct, lang)})
-                </span>
-              ) : null}
-            </>
-          }
-        />
-        <StatCard
-          label={t("dashboard.cards.depositsWithdrawals")}
-          value={formatMoney(s.totalDeposits, lang)}
-          hint={`${t("dashboard.cards.totalWithdrawals")}: ${formatMoney(s.totalWithdrawals, lang)}`}
-        />
-        <StatCard
-          label={t("dashboard.cards.winRate")}
-          value={formatPercent(s.winRate, lang)}
-        />
-        <StatCard
-          label={t("dashboard.cards.profitFactor")}
-          value={formatProfitFactor(s.profitFactor, lang)}
-        />
-        <StatCard
-          label={t("dashboard.cards.totalFees")}
-          value={formatMoney(s.totalFees, lang)}
-        />
-        <StatCard
-          label={t("dashboard.cards.maxDrawdown")}
-          value={formatPercent(s.maxDrawdown, lang)}
-        />
-        <StatCard label={t("dashboard.cards.notionalExposure")} value={formatMoney(s.notionalExposure, lang)} />
-        <StatCard label={t("dashboard.cards.effectiveLeverage")} value={s.effectiveLeverage === null ? "—" : `${s.effectiveLeverage.toLocaleString(undefined, { maximumFractionDigits: 2 })}x`} />
-        <StatCard label={t("dashboard.cards.marginUsed")} value={formatMoney(s.marginUsed, lang)} />
-        <StatCard label={t("dashboard.cards.marginUtilization")} value={formatPercent(s.marginUtilization, lang)} />
-      </div>
+      <section className="space-y-4">
+        <SectionHeading title={t("dashboard.overview.title")} subtitle={t("dashboard.overview.subtitle")} />
+        <div className="grid gap-4 lg:grid-cols-12">
+          <div className="rounded-feature bg-gradient-to-br from-ink-deep via-[#102c45] to-primary-deep p-7 text-canvas lg:col-span-6 lg:p-8">
+            <p className="text-sm font-medium text-canvas/65">{t("dashboard.cards.portfolioEquity")}</p>
+            <p className="mt-3 text-3xl font-medium tracking-tight sm:text-[42px]">{formatMoney(s.portfolioEquity, lang)}</p>
+          </div>
+          <div className="rounded-xxxl border border-success/20 bg-mint-soft p-7 lg:col-span-3">
+            <p className="text-sm font-medium text-steel">{t("dashboard.cards.netTradingPnl")}</p>
+            <p className={`mt-3 text-2xl font-medium tracking-tight ${Number(s.netTradingPnl) >= 0 ? "text-success" : "text-critical"}`}>{formatMoney(s.netTradingPnl, lang)}</p>
+            {depositPct !== null ? <p className={`mt-2 text-sm font-medium ${depositPct >= 0 ? "text-success" : "text-critical"}`}>{formatPercent(depositPct, lang)}</p> : null}
+          </div>
+          <div className="rounded-xxxl border border-primary/15 bg-sky-soft p-7 lg:col-span-3">
+            <p className="text-sm font-medium text-steel">{t("dashboard.cards.netCapitalFlow")}</p>
+            <p className="mt-3 text-2xl font-medium tracking-tight text-ink-deep">{formatMoney(totalDepositsNum - Number(s.totalWithdrawals), lang)}</p>
+            <div className="mt-3 flex gap-3 text-xs text-slate">
+              <span>{t("dashboard.cards.totalDeposits")}: {formatMoney(s.totalDeposits, lang)}</span>
+              <span>{t("dashboard.cards.totalWithdrawals")}: {formatMoney(s.totalWithdrawals, lang)}</span>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section className="space-y-4">
+        <SectionHeading title={t("dashboard.performance.title")} subtitle={t("dashboard.performance.subtitle")} />
+        <div className="grid overflow-hidden rounded-xxxl border border-hairline-soft sm:grid-cols-2 xl:grid-cols-4">
+          <MetricCell label={t("dashboard.cards.winRate")} value={formatPercent(s.winRate, lang)} tone="mint" />
+          <MetricCell label={t("dashboard.cards.profitFactor")} value={formatProfitFactor(s.profitFactor, lang)} tone="violet" />
+          <MetricCell label={t("dashboard.cards.totalFees")} value={formatMoney(s.totalFees, lang)} tone="amber" />
+          <MetricCell label={t("dashboard.cards.maxDrawdown")} value={formatPercent(s.maxDrawdown, lang)} negative tone="rose" />
+        </div>
+      </section>
+
+      <section className="space-y-4">
+        <SectionHeading title={t("dashboard.risk.title")} subtitle={t("dashboard.risk.subtitle")} />
+        <div className="grid overflow-hidden rounded-xxxl border border-hairline-soft bg-surface-soft sm:grid-cols-2 xl:grid-cols-4">
+          <MetricCell label={t("dashboard.cards.notionalExposure")} value={formatMoney(s.notionalExposure, lang)} soft />
+          <MetricCell label={t("dashboard.cards.effectiveLeverage")} value={s.effectiveLeverage === null ? "—" : `${s.effectiveLeverage.toLocaleString(undefined, { maximumFractionDigits: 2 })}x`} soft />
+          <MetricCell label={t("dashboard.cards.marginUsed")} value={formatMoney(s.marginUsed, lang)} soft />
+          <MetricCell label={t("dashboard.cards.marginUtilization")} value={formatPercent(s.marginUtilization, lang)} soft />
+        </div>
+      </section>
 
       <div className="rounded-xxxl border border-hairline-soft bg-canvas">
         <div className="border-b border-hairline-soft px-8 py-6">
@@ -149,6 +143,7 @@ export function DashboardPage() {
                 <th className="px-8 py-3">{t("common.direction")}</th>
                 <th className="px-8 py-3 text-right">{t("common.quantity")}</th>
                 <th className="px-8 py-3 text-right">{t("dashboard.entryPrice")}</th>
+                <th className="px-8 py-3 text-right">{t("dashboard.cards.unrealizedPnl")}</th>
                 <th />
               </tr>
             </thead>
@@ -165,6 +160,9 @@ export function DashboardPage() {
                   <td className="px-8 py-4 text-right">
                     {formatPrice(trade.averageEntryPrice ?? "0", lang)}
                   </td>
+                  <td className={`px-8 py-4 text-right font-medium ${trade.unrealizedPnl === null ? "text-stone" : Number(trade.unrealizedPnl) >= 0 ? "text-success" : "text-critical"}`}>
+                    {trade.unrealizedPnl === null ? "—" : formatMoney(trade.unrealizedPnl, lang)}
+                  </td>
                   <td className="px-8 py-4 text-right">
                     <button className="rounded-full bg-ink-deep px-4 py-2 text-xs font-bold text-canvas transition-colors hover:bg-charcoal" onClick={() => { setClosingTrade(trade); setCloseDate(new Date().toISOString().slice(0, 10)); setClosePrice(""); setCloseFee(""); }}>
                       {t("dashboard.closePosition")}
@@ -174,7 +172,7 @@ export function DashboardPage() {
               ))}
               {(openTrades.data ?? []).length === 0 ? (
                 <tr>
-                  <td colSpan={5} className="px-8 py-10 text-center text-stone">
+                  <td colSpan={6} className="px-8 py-10 text-center text-stone">
                     {t("dashboard.noOpenPositions")}
                   </td>
                 </tr>
@@ -216,10 +214,14 @@ export function DashboardPage() {
       ) : null}
 
       <div className="rounded-xxxl border border-hairline-soft bg-canvas">
-        <div className="border-b border-hairline-soft px-8 py-6">
+        <div className="flex flex-wrap items-end justify-between gap-3 border-b border-hairline-soft px-8 py-6">
           <h2 className="text-[24px] font-medium leading-tight text-ink-deep">
             {t("dashboard.equityCurve")}
           </h2>
+          <div className="text-right">
+            <p className="text-xs font-medium text-steel">{t("dashboard.cards.portfolioEquity")}</p>
+            <p className="mt-1 text-lg font-medium text-primary">{formatMoney(s.portfolioEquity, lang)}</p>
+          </div>
         </div>
         <div className="p-8">
           <div className="h-80">
@@ -259,7 +261,17 @@ export function DashboardPage() {
                   stroke="#0866ff"
                   strokeWidth={2}
                   fill="url(#equityGradient)"
-                />
+                  dot={{ r: 4, fill: "#0866ff", stroke: "#ffffff", strokeWidth: 2 }}
+                  activeDot={{ r: 6, fill: "#0866ff", stroke: "#ffffff", strokeWidth: 2 }}
+                >
+                  <LabelList
+                    dataKey="equity"
+                    position="top"
+                    formatter={(value: number | string) => formatMoney(value, lang)}
+                    fill="#5b6673"
+                    fontSize={11}
+                  />
+                </Area>
               </AreaChart>
             </ResponsiveContainer>
           </div>
@@ -267,4 +279,13 @@ export function DashboardPage() {
       </div>
     </div>
   );
+}
+
+function SectionHeading({ title, subtitle }: { title: string; subtitle: string }) {
+  return <div><h2 className="text-xl font-medium text-ink-deep">{title}</h2><p className="mt-1 text-sm text-slate">{subtitle}</p></div>;
+}
+
+function MetricCell({ label, value, soft = false, negative = false, tone }: { label: string; value: ReactNode; soft?: boolean; negative?: boolean; tone?: "mint" | "violet" | "amber" | "rose" }) {
+  const toneClass = tone === "mint" ? "bg-mint-soft" : tone === "violet" ? "bg-violet-soft" : tone === "amber" ? "bg-amber-soft" : tone === "rose" ? "bg-rose-soft" : soft ? "bg-surface-soft" : "bg-canvas";
+  return <div className={`min-w-0 border-b border-hairline-soft p-5 last:border-b-0 sm:[&:nth-last-child(-n+2)]:border-b-0 xl:border-b-0 xl:border-r xl:last:border-r-0 ${toneClass}`}><p className="text-xs font-medium text-steel">{label}</p><div className={`mt-2 truncate text-xl font-medium tracking-tight ${negative ? "text-critical" : "text-ink-deep"}`}>{value}</div></div>;
 }

@@ -23,6 +23,8 @@
   "summary": {
     "totalDeposits": "Total Deposits",
     "totalWithdrawals": "Total Withdrawals",
-    "netCapitalFlow": "Net Capital Flow"
+    "netCapitalFlow": "Net Capital Flow",
+    "totalInterest": "Total Interest",
+    "totalAdjustments": "Total Adjustments"
   }
 }

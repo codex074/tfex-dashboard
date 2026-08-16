@@ -1,0 +1,16 @@
+# Keep the Docker build context limited to source and production configuration.
+.git
+.env
+.env.*
+!.env.example
+node_modules
+**/node_modules
+dist
+**/dist
+data
+uploads
+backups
+coverage
+*.log
+.DS_Store
+

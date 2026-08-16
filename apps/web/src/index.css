@@ -1,13 +1,17 @@
 @import "tailwindcss";
 
 @theme {
-  --font-sans: "Montserrat", "Noto Sans Thai", "Noto Sans", Helvetica, Arial,
-    sans-serif;
+  --font-sans: "Noto Sans", "Noto Sans Thai", Helvetica, Arial, sans-serif;
 
   /* Brand & accent */
   --color-primary: #0866ff;
   --color-primary-deep: #0143b5;
   --color-primary-soft: #e9f0ff;
+  --color-sky-soft: #eaf7ff;
+  --color-violet-soft: #f1edff;
+  --color-mint-soft: #e7f8f0;
+  --color-amber-soft: #fff4dc;
+  --color-rose-soft: #fff0f0;
   --color-fb-blue: #1877f2;
   --color-meta-link: #0a55c4;
 
@@ -52,12 +56,15 @@
 body {
   margin: 0;
   font-family: var(--font-sans);
+  font-synthesis: none;
+  font-synthesis-weight: none;
+  font-synthesis-style: none;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   background-color: var(--color-canvas);
   color: var(--color-ink-deep);
   line-height: 1.5;
-  letter-spacing: -0.16px;
+  letter-spacing: 0;
 }
 
 button:not(:disabled),

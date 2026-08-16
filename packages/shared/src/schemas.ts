@@ -31,6 +31,26 @@ const priceString = z
 
 const idSchema = z.number().int().positive();
 
+export const loginSchema = z.object({
+  email: z.string().email().transform((value) => value.trim().toLowerCase()),
+  password: z.string().min(8).max(128),
+});
+
+export const createUserSchema = loginSchema.extend({
+  displayName: z.string().trim().min(1).max(100),
+  role: z.enum(["ADMIN", "USER"]).default("USER"),
+});
+
+export const createInstrumentSchema = z.object({
+  code: z.string().trim().min(1).max(20).transform((value) => value.toUpperCase()),
+  name: z.string().trim().min(1).max(100),
+});
+
+export const updateUserPreferencesSchema = z.object({
+  brokerIds: z.array(idSchema).max(50).default([]),
+  instrumentIds: z.array(idSchema).max(100).default([]),
+});
+
 export const createAccountSchema = z.object({
   name: z.string().min(1),
   brokerId: z.number().int().positive().optional(),
@@ -112,7 +132,18 @@ export const createBrokerTransactionSchema = z.object({
 export const openPositionSchema = createBrokerTransactionSchema.omit({
   action: true,
   realizedPnl: true,
-}).extend({ instrumentFamily: z.string().min(1).regex(/^[A-Z0-9]+$/), brokerId: idSchema.optional() });
+}).extend({
+  // Fee values must remain absent when the user does not enter an override,
+  // allowing the broker contract term to supply its configured default.
+  commission: nonNegativeMoneyString.optional(),
+  tradingFee: nonNegativeMoneyString.optional(),
+  clearingFee: nonNegativeMoneyString.optional(),
+  regulatoryFee: nonNegativeMoneyString.optional(),
+  vat: nonNegativeMoneyString.optional(),
+  otherFee: nonNegativeMoneyString.optional(),
+  instrumentFamily: z.string().min(1).regex(/^[A-Z0-9]+$/),
+  brokerId: idSchema.optional(),
+});
 
 export const closePositionSchema = z.object({
   tradeDate: z.string().regex(/^\d{4}-\d{2}-\d{2}$/),
@@ -125,6 +156,16 @@ export const updateBrokerTransactionSchema = createBrokerTransactionSchema
   .partial()
   .omit({ accountId: true });
 
+// Keep trade identity immutable from the transaction editor. Changing its
+// instrument, side, or action would invalidate the mapping to a Trade.
+export const updateManualBrokerTransactionSchema = updateBrokerTransactionSchema.pick({
+  tradeDate: true,
+  quantity: true,
+  price: true,
+  totalFee: true,
+  brokerReference: true,
+});
+
 export const createPositionSchema = z.object({
   accountId: idSchema,
   instrument: z.string().min(1),
@@ -132,6 +173,14 @@ export const createPositionSchema = z.object({
   quantity: z.number().int().positive(),
   averagePrice: priceString,
   marketPrice: priceString.optional().nullable(),
+});
+
+/** A mark is a price observation, never a broker transaction or trade close. */
+export const markPositionPriceSchema = z.object({
+  accountId: idSchema,
+  instrument: z.string().min(1),
+  direction: z.nativeEnum(SIDE),
+  marketPrice: priceString,
 });
 
 export const upsertSnapshotSchema = z.object({

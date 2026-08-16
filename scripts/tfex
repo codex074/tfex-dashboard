@@ -1,0 +1,38 @@
+#!/usr/bin/env bash
+
+# Starts the TFEX API and web app together.  The usual ports are preferred,
+# but an available higher port is selected when either is occupied.
+set -euo pipefail
+
+project_dir="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
+
+find_available_port() {
+  local port="$1"
+
+  while lsof -nP -iTCP:"${port}" -sTCP:LISTEN >/dev/null 2>&1; do
+    port=$((port + 1))
+  done
+
+  printf '%s\n' "${port}"
+}
+
+api_port="$(find_available_port 4000)"
+web_port="$(find_available_port 5173)"
+
+cleanup() {
+  if [[ -n "${api_pid:-}" ]] && kill -0 "${api_pid}" 2>/dev/null; then
+    kill "${api_pid}" 2>/dev/null || true
+  fi
+}
+
+trap cleanup EXIT INT TERM
+
+cd "${project_dir}"
+
+echo "Starting TFEX API on http://127.0.0.1:${api_port}"
+PORT="${api_port}" pnpm --filter @tfex/api dev &
+api_pid=$!
+
+echo "Starting TFEX web app on http://127.0.0.1:${web_port}"
+echo "Press Ctrl+C to stop both services."
+TFEX_API_PORT="${api_port}" pnpm --filter @tfex/web exec vite --host 127.0.0.1 --port "${web_port}"

@@ -1,5 +1,6 @@
 {
   "title": "รายการเทรด",
+  "sessionTitle": "เซสชันเทรด",
   "filters": {
     "search": "ค้นหา",
     "dateRange": "ช่วงวันที่",
@@ -13,6 +14,7 @@
   "columns": {
     "openDate": "วันที่เปิด",
     "closeDate": "วันที่ปิด",
+    "holdingDays": "ระยะเวลาถือครอง (วัน)",
     "instrument": "สัญญา",
     "direction": "ฝั่ง",
     "quantity": "จำนวน",

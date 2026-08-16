@@ -15,6 +15,7 @@ import {
   getTradeById,
   toTradeDetailDto,
   toTradeDto,
+  unrealizedPnlForTrade,
   openPosition,
 } from "../services/trade.service.js";
 
@@ -29,7 +30,7 @@ export function registerTradeRoutes(app: FastifyInstance, db: Db) {
       limit: query.limit,
       offset: query.offset,
     });
-    return { data: rows.map(toTradeDto) };
+    return { data: rows.map((trade) => toTradeDto(trade, unrealizedPnlForTrade(db, trade))) };
   });
 
   app.post("/api/trades", async (request) => {

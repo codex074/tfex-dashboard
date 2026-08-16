@@ -6,14 +6,25 @@
     "openPositions": "Open Positions",
     "unrealizedPnl": "Unrealized P/L",
     "marginUsed": "Margin Used",
-    "excessEquity": "Excess Equity"
+    "excessEquity": "Excess Equity",
+    "netCapitalFlow": "Net Capital Flow",
+    "deposits": "Deposits",
+    "withdrawals": "Withdrawals",
+    "marginUtilization": "Margin Utilization",
+    "availableEquity": "Available Equity",
+    "tradingPnl": "Trading P/L",
+    "vsDeposits": "of total deposits"
   },
+  "updateMarketPrice": "Update Market Price",
+  "markPriceHint": "This updates the latest mark only; it does not close or change the trade.",
+  "markPriceError": "The market price could not be updated.",
   "positionTable": {
     "instrument": "Instrument",
     "direction": "Direction",
     "quantity": "Quantity",
     "averagePrice": "Average Price",
     "marketPrice": "Market Price",
-    "unrealizedPnl": "Unrealized P/L"
+    "unrealizedPnl": "Unrealized P/L",
+    "marginUsed": "Margin Used"
   }
 }

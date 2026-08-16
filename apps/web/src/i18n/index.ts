@@ -62,6 +62,9 @@ export const resources = {
 
 export function initI18n() {
   const lng = getInitialLanguage();
+  if (typeof document !== "undefined") {
+    document.documentElement.lang = lng;
+  }
   void i18n.use(initReactI18next).init({
     resources,
     lng,
@@ -77,6 +80,7 @@ export function initI18n() {
 export function persistLanguage(language: SupportedLanguage) {
   if (typeof window !== "undefined") {
     window.localStorage.setItem(STORAGE_KEY, language);
+    document.documentElement.lang = language;
   }
 }
 

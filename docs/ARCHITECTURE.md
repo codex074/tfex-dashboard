@@ -56,6 +56,14 @@ ultimately stores `number` (safe because TFEX account values remain well within
    operates only on integers.
 6. Results are serialized back to decimal strings.
 
+## Membership and permissions
+
+The first account created through `/api/auth/bootstrap` becomes an `ADMIN`.
+Admins create subsequent members and maintain brokers, instruments, contract
+specifications, commission, and margin terms. Regular users maintain their own
+many-to-many broker and instrument defaults. Login sessions use random bearer
+tokens; only SHA-256 token hashes and scrypt password hashes are stored.
+
 ## Source of truth
 
 ```

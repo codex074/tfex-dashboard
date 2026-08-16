@@ -5,6 +5,7 @@
     "portfolio": "พอร์ต",
     "trades": "รายการเทรด",
     "transactions": "ธุรกรรม",
+    "sessions": "เซสชันเทรด",
     "journal": "บันทึกการเทรด",
     "cashFlow": "กระแสเงิน",
     "analytics": "การวิเคราะห์",
@@ -14,6 +15,20 @@
   "language": {
     "thai": "ไทย",
     "english": "English"
+  },
+  "auth": {
+    "setupTitle": "สร้างผู้ดูแลระบบ",
+    "setupHelp": "บัญชีแรกจะเป็น Admin สำหรับจัดการสมาชิก โบรกเกอร์ และเงื่อนไขการเทรด",
+    "loginTitle": "เข้าสู่ระบบ",
+    "loginHelp": "เข้าสู่ระบบ TFEX Trading Journal",
+    "displayName": "ชื่อที่แสดง",
+    "email": "อีเมล",
+    "password": "รหัสผ่าน (อย่างน้อย 8 ตัวอักษร)",
+    "createAdmin": "สร้างบัญชี Admin",
+    "login": "เข้าสู่ระบบ",
+    "logout": "ออกจากระบบ",
+    "saving": "กำลังดำเนินการ…",
+    "error": "อีเมลหรือรหัสผ่านไม่ถูกต้อง"
   },
   "transactionForm": {
     "title": "บันทึกธุรกรรม",
@@ -25,7 +40,12 @@
     "saving": "กำลังบันทึก…",
     "errors": { "duplicate": "มีธุรกรรมนี้อยู่แล้ว", "submit": "ไม่สามารถบันทึกธุรกรรมได้ กรุณาตรวจสอบข้อมูล" }
   },
-  "settings": { "title": "ตั้งค่า", "contractSpecs": "สเปกสัญญา", "contractHelp": "กำหนด multiplier และ tick size ของสินทรัพย์", "brokerTerms": "เงื่อนไข Broker", "brokerHelp": "กำหนด margin และค่าธรรมเนียมตาม broker", "instrumentFamily": "สินทรัพย์", "multiplier": "บาทต่อจุด", "tickSize": "Tick size", "effectiveDate": "มีผลตั้งแต่", "broker": "Broker", "selectBroker": "เลือก Broker", "initialMargin": "Initial Margin", "maintenanceMargin": "Maintenance Margin", "commission": "Commission" },
+  "transactionEdit": {
+    "title": "แก้ไขธุรกรรม",
+    "saving": "กำลังบันทึก…",
+    "error": "ไม่สามารถแก้ไขธุรกรรมได้ กรุณาตรวจสอบข้อมูล"
+  },
+  "settings": { "title": "ตั้งค่า", "myDefaults": "ค่าเริ่มต้นของฉัน", "myDefaultsHelp": "เลือก Broker และสินทรัพย์ที่คุณใช้งาน ตัวเลือกที่เลือกจะปรากฏใน Dropdown ตอนบันทึกธุรกรรม", "saveDefaults": "บันทึกค่าเริ่มต้น", "saved": "บันทึกแล้ว", "adminArea": "การตั้งค่าสำหรับ Admin", "members": "สมาชิก", "membersHelp": "สร้างบัญชีผู้ใช้และกำหนดสิทธิ์", "role": "สิทธิ์", "addMember": "เพิ่มสมาชิก", "instruments": "รายการสินทรัพย์", "instrumentsHelp": "จัดการสินทรัพย์ที่ผู้ใช้เลือกได้ เช่น S50 และ GO", "instrumentCode": "รหัสสินทรัพย์", "instrumentName": "ชื่อสินทรัพย์", "addInstrument": "เพิ่มสินทรัพย์", "contractSpecs": "สเปกสัญญา", "contractHelp": "กำหนด multiplier และ tick size ของสินทรัพย์", "brokerTerms": "เงื่อนไข Broker", "brokerHelp": "กำหนดเงินประกันและค่าธรรมเนียมตาม Broker", "instrumentFamily": "สินทรัพย์", "multiplier": "บาทต่อจุด", "tickSize": "Tick size", "effectiveDate": "มีผลตั้งแต่", "broker": "Broker", "selectBroker": "เลือก Broker", "initialMargin": "เงินประกันเริ่มต้น", "maintenanceMargin": "เงินประกันรักษาสถานะ", "commission": "Commission" },
   "account": {
     "title": "บัญชีเทรด",
     "help": "สร้างบัญชีเทรดของคุณเพื่อเริ่มบันทึกการเทรด",
@@ -34,6 +54,14 @@
     "initialCapital": "เงินทุนเริ่มต้น (บาท)",
     "create": "สร้างบัญชี",
     "creating": "กำลังสร้าง…"
+  },
+  "brokers": {
+    "title": "Brokers",
+    "help": "เพิ่ม Broker ของคุณก่อนตั้งค่าเงื่อนไข Broker",
+    "name": "ชื่อ Broker",
+    "shortName": "ชื่อย่อ",
+    "add": "เพิ่ม Broker",
+    "adding": "กำลังเพิ่ม…"
   },
   "common": {
     "loading": "กำลังโหลด…",

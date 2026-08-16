@@ -21,6 +21,9 @@ Drizzle ORM provides the schema. Default location: `data/tfex.db`.
 | `trade_journals` | One journal entry per trade |
 | `tags` / `trade_tags` | User-generated journal tags |
 | `attachments` | File metadata (files stored on disk, not in SQLite) |
+| `users` / `auth_sessions` | Member identities, roles, and hashed login sessions |
+| `instruments` | Admin-maintained instrument-family directory |
+| `user_brokers` / `user_instruments` | Per-user multi-select dropdown defaults |
 
 ## Key constraints
 

@@ -1,5 +1,6 @@
 {
   "title": "Trades",
+  "sessionTitle": "Trading Sessions",
   "filters": {
     "search": "Search",
     "dateRange": "Date Range",
@@ -13,6 +14,7 @@
   "columns": {
     "openDate": "Open Date",
     "closeDate": "Close Date",
+    "holdingDays": "Holding Days",
     "instrument": "Instrument",
     "direction": "Direction",
     "quantity": "Quantity",

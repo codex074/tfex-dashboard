@@ -5,6 +5,7 @@ import { BrowserRouter } from "react-router-dom";
 import "./index.css";
 import { initI18n } from "./i18n";
 import App from "./App";
+import { AuthProvider } from "./auth/AuthContext";
 
 initI18n();
 
@@ -20,9 +21,7 @@ const queryClient = new QueryClient({
 ReactDOM.createRoot(document.getElementById("root")!).render(
   <React.StrictMode>
     <QueryClientProvider client={queryClient}>
-      <BrowserRouter>
-        <App />
-      </BrowserRouter>
+      <AuthProvider><BrowserRouter><App /></BrowserRouter></AuthProvider>
     </QueryClientProvider>
   </React.StrictMode>,
 );

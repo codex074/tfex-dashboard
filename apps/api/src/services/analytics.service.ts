@@ -1,7 +1,8 @@
-import { and, eq, gte, lte } from "drizzle-orm";
-import { TRADE_STATUS } from "@tfex/shared";
+import { and, asc, eq, gte, lte } from "drizzle-orm";
+import { CASH_TRANSACTION_TYPE, TRADE_STATUS } from "@tfex/shared";
 import type { Db } from "../db/client.js";
 import * as schema from "../db/schema.js";
+import { accountSummary } from "./account.service.js";
 import {
   computeDrawdown,
   computeSummary,
@@ -13,6 +14,7 @@ import {
   type TradeResultInput,
 } from "../domain/analytics.js";
 import { money } from "../lib/serialize.js";
+import { parseMoneyOrZero } from "../lib/parse.js";
 
 export interface AnalyticsFilters {
   accountId?: number;
@@ -151,10 +153,105 @@ export function equityCurve(db: Db, accountId: number) {
     .orderBy(schema.dailyAccountSnapshots.snapshotDate)
     .all();
 
-  const equity = snapshots.map((s) => ({
+  const snapshotPoints = snapshots.map((s) => ({
     date: s.snapshotDate,
     equity: s.equityBalance,
   }));
+
+  // Broker snapshots remain the authoritative source. When history has not
+  // been imported yet, expose the first verified capital contribution as the
+  // starting point instead of rendering a misleading empty chart.
+  const firstDeposit = db
+    .select({
+      date: schema.cashTransactions.transactionDate,
+      amount: schema.cashTransactions.amount,
+    })
+    .from(schema.cashTransactions)
+    .where(
+      and(
+        eq(schema.cashTransactions.accountId, accountId),
+        eq(schema.cashTransactions.type, CASH_TRANSACTION_TYPE.DEPOSIT),
+      ),
+    )
+    .orderBy(
+      asc(schema.cashTransactions.transactionDate),
+      asc(schema.cashTransactions.id),
+    )
+    .limit(1)
+    .get();
+
+  const hasAuthoritativeStartingPoint = firstDeposit !== undefined &&
+    snapshotPoints.some((point) => point.date <= firstDeposit.date);
+  let equity: Array<{ date: string; equity: number }>;
+  if (snapshotPoints.length > 0) {
+    equity = firstDeposit && !hasAuthoritativeStartingPoint
+      ? [{ date: firstDeposit.date, equity: firstDeposit.amount }, ...snapshotPoints]
+      : snapshotPoints;
+  } else if (firstDeposit) {
+    // With no broker snapshots, reconstruct daily equity from the ledger.
+    // Cash movements stay distinct in storage, but they must affect account
+    // equity on their effective date. Closed trades add their already
+    // fee-inclusive net P/L on the closing date.
+    const changesByDate = new Map<string, number>();
+    const addChange = (date: string, amount: number) => {
+      changesByDate.set(date, (changesByDate.get(date) ?? 0) + amount);
+    };
+
+    const cashMovements = db
+      .select({
+        date: schema.cashTransactions.transactionDate,
+        type: schema.cashTransactions.type,
+        amount: schema.cashTransactions.amount,
+      })
+      .from(schema.cashTransactions)
+      .where(eq(schema.cashTransactions.accountId, accountId))
+      .all();
+    for (const movement of cashMovements) {
+      if (movement.date < firstDeposit.date) continue;
+      const signedAmount = movement.type === CASH_TRANSACTION_TYPE.WITHDRAWAL
+        ? -movement.amount
+        : movement.amount;
+      addChange(movement.date, signedAmount);
+    }
+
+    const closedTrades = db
+      .select({ date: schema.trades.closedAt, netPnl: schema.trades.netPnl })
+      .from(schema.trades)
+      .where(
+        and(
+          eq(schema.trades.accountId, accountId),
+          eq(schema.trades.status, TRADE_STATUS.CLOSED),
+        ),
+      )
+      .all();
+    for (const trade of closedTrades) {
+      if (trade.date && trade.date >= firstDeposit.date) {
+        addChange(trade.date, trade.netPnl);
+      }
+    }
+
+    let runningEquity = 0;
+    equity = Array.from(changesByDate.entries())
+      .sort(([left], [right]) => left.localeCompare(right))
+      .map(([date, change]) => {
+        runningEquity += change;
+        return { date, equity: runningEquity };
+      });
+  } else {
+    equity = [];
+  }
+
+  // Show the live Portfolio Equity as the final point when the latest
+  // broker-provided snapshot is from an earlier day. This makes the chart
+  // useful between statement imports without replacing historical snapshots.
+  const currentDate = bangkokToday();
+  const lastPoint = equity.at(-1);
+  if (lastPoint && lastPoint.date < currentDate) {
+    equity.push({
+      date: currentDate,
+      equity: parseMoneyOrZero(accountSummary(db, accountId).equityBalance),
+    });
+  }
 
   const drawdown = computeDrawdown(equity);
 
@@ -169,4 +266,16 @@ export function equityCurve(db: Db, accountId: number) {
     peakEquity: money(drawdown.peakEquity ?? 0) ?? "0",
     troughEquity: money(drawdown.troughEquity ?? 0) ?? "0",
   };
+}
+
+function bangkokToday(): string {
+  const parts = new Intl.DateTimeFormat("en-CA", {
+    timeZone: "Asia/Bangkok",
+    year: "numeric",
+    month: "2-digit",
+    day: "2-digit",
+  }).formatToParts(new Date());
+  const value = (type: Intl.DateTimeFormatPartTypes) =>
+    parts.find((part) => part.type === type)?.value;
+  return `${value("year")}-${value("month")}-${value("day")}`;
 }

@@ -5,6 +5,7 @@
     "portfolio": "Portfolio",
     "trades": "Trades",
     "transactions": "Transactions",
+    "sessions": "Trading Sessions",
     "journal": "Journal",
     "cashFlow": "Cash Flow",
     "analytics": "Analytics",
@@ -14,6 +15,20 @@
   "language": {
     "thai": "ไทย",
     "english": "English"
+  },
+  "auth": {
+    "setupTitle": "Create administrator",
+    "setupHelp": "The first account is the Admin who manages members, brokers, and trading terms.",
+    "loginTitle": "Sign in",
+    "loginHelp": "Sign in to TFEX Trading Journal.",
+    "displayName": "Display name",
+    "email": "Email",
+    "password": "Password (at least 8 characters)",
+    "createAdmin": "Create Admin account",
+    "login": "Sign in",
+    "logout": "Sign out",
+    "saving": "Please wait…",
+    "error": "Invalid email or password."
   },
   "transactionForm": {
     "title": "Record transaction",
@@ -25,7 +40,12 @@
     "saving": "Saving…",
     "errors": { "duplicate": "This transaction already exists.", "submit": "Unable to save the transaction. Please check the details." }
   },
-  "settings": { "title": "Settings", "contractSpecs": "Contract specs", "contractHelp": "Set the multiplier and tick size for each instrument.", "brokerTerms": "Broker terms", "brokerHelp": "Set margin and fee defaults per broker.", "instrumentFamily": "Instrument", "multiplier": "THB per point", "tickSize": "Tick size", "effectiveDate": "Effective from", "broker": "Broker", "selectBroker": "Select broker", "initialMargin": "Initial margin", "maintenanceMargin": "Maintenance margin", "commission": "Commission" },
+  "transactionEdit": {
+    "title": "Edit transaction",
+    "saving": "Saving…",
+    "error": "Unable to update the transaction. Please check the details."
+  },
+  "settings": { "title": "Settings", "myDefaults": "My defaults", "myDefaultsHelp": "Select the brokers and instruments you use. Your choices populate transaction dropdowns.", "saveDefaults": "Save defaults", "saved": "Saved", "adminArea": "Admin settings", "members": "Members", "membersHelp": "Create member accounts and assign roles.", "role": "Role", "addMember": "Add member", "instruments": "Instruments", "instrumentsHelp": "Manage instruments users can select, such as S50 and GO.", "instrumentCode": "Instrument code", "instrumentName": "Instrument name", "addInstrument": "Add instrument", "contractSpecs": "Contract specs", "contractHelp": "Set the multiplier and tick size for each instrument.", "brokerTerms": "Broker terms", "brokerHelp": "Set margin and fee defaults per broker.", "instrumentFamily": "Instrument", "multiplier": "THB per point", "tickSize": "Tick size", "effectiveDate": "Effective from", "broker": "Broker", "selectBroker": "Select broker", "initialMargin": "Initial margin", "maintenanceMargin": "Maintenance margin", "commission": "Commission" },
   "account": {
     "title": "Trading account",
     "help": "Create your trading account to start recording trades.",
@@ -34,6 +54,14 @@
     "initialCapital": "Initial capital (THB)",
     "create": "Create account",
     "creating": "Creating…"
+  },
+  "brokers": {
+    "title": "Brokers",
+    "help": "Add your brokers before setting up broker terms.",
+    "name": "Broker name",
+    "shortName": "Short name",
+    "add": "Add broker",
+    "adding": "Adding…"
   },
   "common": {
     "loading": "Loading…",

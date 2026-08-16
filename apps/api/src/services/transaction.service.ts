@@ -169,6 +169,62 @@ export function getBrokerTransaction(db: Db, id: number) {
   return tx;
 }
 
+export interface UpdateBrokerTransactionInput {
+  tradeDate?: string;
+  quantity?: number;
+  price?: string;
+  totalFee?: string | null;
+  brokerReference?: string | null;
+}
+
+export function updateBrokerTransaction(
+  db: Db,
+  id: number,
+  input: UpdateBrokerTransactionInput,
+) {
+  const existing = getBrokerTransaction(db, id);
+  const pricePoints =
+    input.price === undefined ? existing.price : parsePrice(input.price);
+  if (pricePoints === null || pricePoints <= 0) {
+    throw errors.validation("price must be greater than 0");
+  }
+  const quantity = input.quantity ?? existing.quantity;
+  if (!Number.isInteger(quantity) || quantity <= 0) {
+    throw errors.validation("quantity must be greater than 0");
+  }
+
+  const totalFee =
+    input.totalFee === undefined
+      ? existing.totalFee
+      : input.totalFee === null
+        ? totalFeeSatang({
+            commission: existing.commission,
+            tradingFee: existing.tradingFee,
+            clearingFee: existing.clearingFee,
+            regulatoryFee: existing.regulatoryFee,
+            vat: existing.vat,
+            otherFee: existing.otherFee,
+          })
+        : parseMoneyOrZero(input.totalFee);
+
+  return db
+    .update(schema.brokerTransactions)
+    .set({
+      tradeDate: input.tradeDate ?? existing.tradeDate,
+      quantity,
+      price: pricePoints,
+      totalFee,
+      brokerReference:
+        input.brokerReference === undefined
+          ? existing.brokerReference
+          : input.brokerReference,
+      updatedAt: new Date().toISOString(),
+    })
+    .where(eq(schema.brokerTransactions.id, id))
+    .returning()
+    .get();
+}
+
 export function toBrokerTransactionDto(tx: schema.BrokerTransaction) {
   return {
     id: tx.id,

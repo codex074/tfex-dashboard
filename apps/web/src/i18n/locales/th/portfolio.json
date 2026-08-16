@@ -6,14 +6,25 @@
     "openPositions": "สถานะเปิด",
     "unrealizedPnl": "กำไร/ขาดทุนที่ยังไม่รับรู้ (Unrealized P/L)",
     "marginUsed": "หลักประกันที่ใช้",
-    "excessEquity": "เงินส่วนเกิน"
+    "excessEquity": "เงินส่วนเกิน",
+    "netCapitalFlow": "กระแสเงินทุนสุทธิ",
+    "deposits": "เงินฝาก",
+    "withdrawals": "เงินถอน",
+    "marginUtilization": "การใช้หลักประกัน",
+    "availableEquity": "Equity คงเหลือที่ใช้ได้",
+    "tradingPnl": "กำไร/ขาดทุนจากการเทรด (Trading P/L)",
+    "vsDeposits": "ของเงินฝากรวม"
   },
+  "updateMarketPrice": "อัปเดตราคาตลาด",
+  "markPriceHint": "การอัปเดตนี้บันทึกราคาประเมินล่าสุดเท่านั้น และจะไม่ปิดหรือแก้ไขรายการเทรด",
+  "markPriceError": "ไม่สามารถอัปเดตราคาตลาดได้",
   "positionTable": {
     "instrument": "สัญญา",
     "direction": "ฝั่ง",
     "quantity": "จำนวน",
     "averagePrice": "ราคาเฉลี่ย",
     "marketPrice": "ราคาตลาด",
-    "unrealizedPnl": "กำไร/ขาดทุนที่ยังไม่รับรู้ (Unrealized P/L)"
+    "unrealizedPnl": "กำไร/ขาดทุนที่ยังไม่รับรู้ (Unrealized P/L)",
+    "marginUsed": "หลักประกันที่ใช้"
   }
 }

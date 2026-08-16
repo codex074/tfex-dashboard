@@ -1,5 +1,5 @@
 import { useQuery } from "@tanstack/react-query";
-import { Link } from "react-router-dom";
+import type { ReactNode } from "react";
 import { useTranslation } from "react-i18next";
 import { api, type Trade } from "../services/api";
 import { useActiveAccountId } from "../hooks/useAccounts";
@@ -37,83 +37,107 @@ export function TradesPage() {
     return <ErrorState message={t("common.error")} />;
   }
 
+  const list = trades.data ?? [];
+
   return (
     <div className="space-y-10">
-      <PageTitle title={t("trades.title")} />
+      <PageTitle
+        title={t("trades.sessionTitle")}
+        actions={
+          <span className="rounded-full bg-surface-soft px-3 py-1 text-xs font-bold text-steel">
+            {formatNumber(list.length, lang)}
+          </span>
+        }
+      />
 
-      <div className="rounded-xxxl border border-hairline-soft bg-canvas">
-        <div className="overflow-x-auto">
-          <table className="w-full text-sm">
-            <thead>
-              <tr className="border-b border-hairline-soft text-left text-xs font-medium uppercase tracking-wide text-steel">
-                <th className="px-8 py-3">{t("trades.columns.openDate")}</th>
-                <th className="px-8 py-3">{t("trades.columns.closeDate")}</th>
-                <th className="px-8 py-3">{t("trades.columns.instrument")}</th>
-                <th className="px-8 py-3">{t("trades.columns.direction")}</th>
-                <th className="px-8 py-3 text-right">{t("trades.columns.quantity")}</th>
-                <th className="px-8 py-3 text-right">{t("trades.columns.averageEntry")}</th>
-                <th className="px-8 py-3 text-right">{t("trades.columns.averageExit")}</th>
-                <th className="px-8 py-3 text-right">{t("trades.columns.grossPnl")}</th>
-                <th className="px-8 py-3 text-right">{t("trades.columns.fees")}</th>
-                <th className="px-8 py-3 text-right">{t("trades.columns.netPnl")}</th>
-                <th className="px-8 py-3">{t("trades.columns.status")}</th>
-              </tr>
-            </thead>
-            <tbody>
-              {(trades.data ?? []).map((trade) => (
-                <tr
-                  key={trade.id}
-                  className="border-b border-hairline-soft transition-colors last:border-0 hover:bg-surface-soft"
-                >
-                  <td className="px-8 py-4 text-slate">{formatDate(trade.openedAt, lang)}</td>
-                  <td className="px-8 py-4 text-slate">{formatDate(trade.closedAt, lang)}</td>
-                  <td className="px-8 py-4">
-                    <Link
-                      to={`/trades/${trade.id}`}
-                      className="font-medium text-primary-deep transition-colors hover:underline"
-                    >
+      {list.length === 0 ? (
+        <p className="py-12 text-center text-stone">{t("common.empty")}</p>
+      ) : (
+        <div className="space-y-4">
+          {list.map((trade) => {
+            const net = Number(trade.netPnl);
+            const direction = trade.direction;
+            const accent = net > 0 ? "border-success/20" : net < 0 ? "border-critical/20" : "border-hairline-soft";
+            return (
+              <article
+                key={trade.id}
+                className={`overflow-hidden rounded-xxxl border bg-canvas ${accent}`}
+              >
+                <div className="flex flex-wrap items-center justify-between gap-3 border-b border-hairline-soft px-6 py-4">
+                  <div className="flex items-center gap-3">
+                    <span className="inline-flex items-center rounded-full bg-primary-soft px-3 py-1 text-xs font-bold text-primary">
                       {trade.instrument}
-                    </Link>
-                  </td>
-                  <td className="px-8 py-4">
-                    <DirectionBadge direction={trade.direction} />
-                  </td>
-                  <td className="px-8 py-4 text-right">
-                    {formatNumber(trade.totalEntryQuantity, lang)}
-                  </td>
-                  <td className="px-8 py-4 text-right">
-                    {formatPrice(trade.averageEntryPrice, lang)}
-                  </td>
-                  <td className="px-8 py-4 text-right">
-                    {formatPrice(trade.averageExitPrice, lang)}
-                  </td>
-                  <td className="px-8 py-4 text-right">
-                    <PnlText value={trade.grossPnl} lang={lang} />
-                  </td>
-                  <td className="px-8 py-4 text-right">
-                    {formatMoney(trade.totalFees, lang)}
-                  </td>
-                  <td className="px-8 py-4 text-right">
-                    <PnlText value={trade.netPnl} lang={lang} />
-                  </td>
-                  <td className="px-8 py-4">
-                    <Badge tone={statusTone[trade.status] ?? "neutral"}>
-                      {t(`trades.status.${trade.status}`)}
-                    </Badge>
-                  </td>
-                </tr>
-              ))}
-              {(trades.data ?? []).length === 0 ? (
-                <tr>
-                  <td colSpan={11} className="px-8 py-12 text-center text-stone">
-                    {t("common.empty")}
-                  </td>
-                </tr>
-              ) : null}
-            </tbody>
-          </table>
+                    </span>
+                    <DirectionBadge direction={direction} />
+                  </div>
+                  <Badge tone={statusTone[trade.status] ?? "neutral"}>
+                    {t(`trades.status.${trade.status}`)}
+                  </Badge>
+                </div>
+
+                <div className="grid gap-6 p-6 lg:grid-cols-12 lg:items-center">
+                  <div className="lg:col-span-4">
+                    <p className="text-xs font-medium text-steel">
+                      {t("trades.columns.netPnl")}
+                    </p>
+                    <p
+                      className={`mt-2 text-3xl font-medium tracking-tight ${
+                        net > 0 ? "text-success" : net < 0 ? "text-critical" : "text-ink-deep"
+                      }`}
+                    >
+                      {formatMoney(trade.netPnl, lang)}
+                    </p>
+                  </div>
+
+                  <div className="grid grid-cols-2 gap-x-6 gap-y-4 text-sm sm:grid-cols-4 lg:col-span-8">
+                    <SessionValue
+                      label={t("trades.columns.openDate")}
+                      value={formatDate(trade.openedAt, lang)}
+                    />
+                    <SessionValue
+                      label={t("trades.columns.closeDate")}
+                      value={formatDate(trade.closedAt, lang)}
+                    />
+                    <SessionValue
+                      label={t("trades.columns.holdingDays")}
+                      value={trade.holdingDays === null ? "—" : formatNumber(trade.holdingDays, lang)}
+                    />
+                    <SessionValue
+                      label={t("trades.columns.quantity")}
+                      value={formatNumber(trade.totalEntryQuantity, lang)}
+                    />
+                    <SessionValue
+                      label={t("trades.columns.averageEntry")}
+                      value={formatPrice(trade.averageEntryPrice, lang)}
+                    />
+                    <SessionValue
+                      label={t("trades.columns.averageExit")}
+                      value={formatPrice(trade.averageExitPrice, lang)}
+                    />
+                    <SessionValue
+                      label={t("trades.columns.grossPnl")}
+                      value={<PnlText value={trade.grossPnl} lang={lang} />}
+                    />
+                    <SessionValue
+                      label={t("trades.columns.fees")}
+                      value={formatMoney(trade.totalFees, lang)}
+                    />
+                  </div>
+                </div>
+              </article>
+            );
+          })}
         </div>
-      </div>
+      )}
+    </div>
+  );
+}
+
+function SessionValue({ label, value }: { label: string; value: ReactNode }) {
+  return (
+    <div>
+      <dt className="text-xs font-medium text-steel">{label}</dt>
+      <dd className="mt-1 font-medium text-ink-deep">{value}</dd>
     </div>
   );
 }

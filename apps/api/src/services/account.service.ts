@@ -1,12 +1,15 @@
-import { desc, eq } from "drizzle-orm";
+import { and, desc, eq } from "drizzle-orm";
+import { TRADE_STATUS } from "@tfex/shared";
 import type { Db } from "../db/client.js";
 import * as schema from "../db/schema.js";
 import { computeCapitalFlow } from "../domain/portfolio.js";
 import { parseMoneyOrZero } from "../lib/parse.js";
 import { money } from "../lib/serialize.js";
 import { errors } from "../lib/errors.js";
+import { positionTotals } from "./position.service.js";
 
 export interface CreateAccountInput {
+  userId?: number;
   name: string;
   brokerId?: number;
   accountNumber?: string | null;
@@ -20,6 +23,7 @@ export function createAccount(db: Db, input: CreateAccountInput) {
     .insert(schema.accounts)
     .values({
       name: input.name,
+      userId: input.userId,
       brokerId: input.brokerId,
       accountNumber: input.accountNumber ?? null,
       accountType: input.accountType ?? "DERIVATIVES",
@@ -31,8 +35,9 @@ export function createAccount(db: Db, input: CreateAccountInput) {
   return row;
 }
 
-export function listAccounts(db: Db) {
-  return db.select().from(schema.accounts).orderBy(desc(schema.accounts.createdAt)).all();
+export function listAccounts(db: Db, userId?: number) {
+  const query = db.select().from(schema.accounts);
+  return (userId === undefined ? query : query.where(eq(schema.accounts.userId, userId))).orderBy(desc(schema.accounts.createdAt)).all();
 }
 
 export function getAccount(db: Db, id: number) {
@@ -81,8 +86,9 @@ export function accountSummary(db: Db, accountId: number): AccountSummary {
     .all();
 
   const latest = snapshots[0];
+  const positions = positionTotals(db, accountId);
 
-  const realizedPnl = db
+  const brokerRealizedPnl = db
     .select({
       realizedPnl: schema.brokerTransactions.realizedPnl,
     })
@@ -90,17 +96,44 @@ export function accountSummary(db: Db, accountId: number): AccountSummary {
     .where(eq(schema.brokerTransactions.accountId, accountId))
     .all();
 
-  const totalRealized = realizedPnl.reduce(
+  const brokerReportedRealized = brokerRealizedPnl.reduce(
     (sum, r) => sum + (r.realizedPnl ?? 0),
     0,
   );
 
-  const cashBalance = latest?.cashBalance ?? 0;
-  const equityBalance = latest?.equityBalance ?? cashBalance;
+  // A position closed manually from the dashboard is calculated into its
+  // derived Trade record. Its broker transaction has no broker-reported P/L,
+  // so summing broker_transactions.realized_pnl would incorrectly leave the
+  // dashboard at zero. Completed trade results are the canonical calculated
+  // value until an authoritative broker snapshot is imported.
+  const closedTrades = db
+    .select({ netPnl: schema.trades.netPnl })
+    .from(schema.trades)
+    .where(
+      and(
+        eq(schema.trades.accountId, accountId),
+        eq(schema.trades.status, TRADE_STATUS.CLOSED),
+      ),
+    )
+    .all();
+  const calculatedRealized = closedTrades.reduce(
+    (sum, trade) => sum + trade.netPnl,
+    0,
+  );
+  const totalRealized =
+    closedTrades.length > 0 ? calculatedRealized : brokerReportedRealized;
 
-  const netTradingProfit =
-    equityBalance - account.initialCapital - flows.totalDeposits +
-    flows.totalWithdrawals;
+  // A broker snapshot cash balance is treated as free cash. For accounts
+  // without a snapshot, derive it from capital, realized performance and the
+  // currently locked initial margin.
+  const cashBalance = latest?.cashBalance ?? (
+    account.initialCapital + flows.netCapitalFlow + totalRealized - positions.marginUsed
+  );
+  // Live Equity intentionally includes collateral: it remains the account's
+  // asset even though it is unavailable for new orders.
+  const equityBalance = cashBalance + positions.marginUsed + positions.unrealizedPnl;
+
+  const netTradingProfit = totalRealized + positions.unrealizedPnl;
 
   return {
     account: toAccountDto(account),
@@ -111,7 +144,7 @@ export function accountSummary(db: Db, accountId: number): AccountSummary {
     netCapitalFlow: money(flows.netCapitalFlow) ?? "0",
     netTradingProfit: money(netTradingProfit) ?? "0",
     realizedPnl: money(totalRealized) ?? "0",
-    unrealizedPnl: money(latest?.unrealizedPnl ?? 0) ?? "0",
+    unrealizedPnl: money(positions.unrealizedPnl) ?? "0",
   };
 }
 

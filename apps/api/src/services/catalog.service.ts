@@ -1,9 +1,10 @@
 import { asc, eq } from "drizzle-orm";
 import type { Db } from "../db/client.js";
 import * as schema from "../db/schema.js";
-import type { NewBroker, NewStrategy, NewTag } from "../db/schema.js";
+import type { NewBroker, NewInstrument, NewStrategy, NewTag } from "../db/schema.js";
 import { parseMoneyOrZero, parsePriceOrZero } from "../lib/parse.js";
 import { money, price } from "../lib/serialize.js";
+import { errors } from "../lib/errors.js";
 
 /** Broker, strategy and tag management (AGENTS.md §16-17, §27-28). */
 
@@ -13,6 +14,20 @@ export function createBroker(db: Db, input: NewBroker) {
 
 export function listBrokers(db: Db) {
   return db.select().from(schema.brokers).orderBy(asc(schema.brokers.name)).all();
+}
+
+export function createInstrument(db: Db, input: NewInstrument) {
+  const existing = db.select().from(schema.instruments).where(eq(schema.instruments.code, input.code)).get();
+  if (existing) throw errors.conflict(`Instrument ${input.code} already exists`);
+  return db.insert(schema.instruments).values(input).returning().get();
+}
+
+export function listInstruments(db: Db) {
+  return db.select().from(schema.instruments).orderBy(asc(schema.instruments.code)).all();
+}
+
+export function toInstrumentDto(row: schema.Instrument) {
+  return { id: row.id, code: row.code, name: row.name, isActive: row.isActive, createdAt: row.createdAt, updatedAt: row.updatedAt };
 }
 
 export function createInstrumentContractSpec(db: Db, input: { instrumentFamily: string; multiplier: string; tickSize: string; effectiveDate: string }) {

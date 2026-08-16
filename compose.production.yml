@@ -1,0 +1,45 @@
+services:
+  tfexdash_api:
+    build:
+      context: .
+      target: api
+    container_name: tfexdash-api
+    restart: unless-stopped
+    environment:
+      NODE_ENV: production
+      HOST: 0.0.0.0
+      PORT: 4000
+      DATABASE_URL: /data/tfex.db
+    volumes:
+      - ./data:/data
+      - ./uploads:/uploads
+      - ./backups:/app/apps/api/backups
+    networks:
+      - tfexdash_internal
+    healthcheck:
+      test: ["CMD", "node", "-e", "fetch('http://127.0.0.1:4000/api/health').then(r => process.exit(r.ok ? 0 : 1)).catch(() => process.exit(1))"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 15s
+
+  tfexdash_web:
+    build:
+      context: .
+      target: web
+    container_name: tfexdash-web
+    restart: unless-stopped
+    depends_on:
+      tfexdash_api:
+        condition: service_healthy
+    networks:
+      - tfexdash_internal
+      - caddy_ingress
+
+networks:
+  tfexdash_internal:
+    name: tfexdash_internal
+    driver: bridge
+  caddy_ingress:
+    name: deploy_default
+    external: true

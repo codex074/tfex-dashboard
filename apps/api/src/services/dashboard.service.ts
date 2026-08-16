@@ -4,21 +4,38 @@ import { analyticsSummary, equityCurve } from "./analytics.service.js";
 import { cashFlowSummary } from "./transaction.service.js";
 import * as schema from "../db/schema.js";
 import { eq } from "drizzle-orm";
-import { parseMoneyOrZero } from "../lib/parse.js";
 import { money } from "../lib/serialize.js";
+import { currentPositions, positionTotals } from "./position.service.js";
 
 export function dashboardSummary(db: Db, accountId: number) {
   const account = accountSummary(db, accountId);
   const analytics = analyticsSummary(db, { accountId });
   const cashFlow = cashFlowSummary(db, accountId);
+  // Dashboard fee total represents the cost already incurred across every
+  // order, including entries that remain open. Analytics intentionally uses
+  // closed trades only for performance statistics.
+  const totalFees = db
+    .select({ totalFee: schema.brokerTransactions.totalFee })
+    .from(schema.brokerTransactions)
+    .where(eq(schema.brokerTransactions.accountId, accountId))
+    .all()
+    .reduce((sum, transaction) => sum + (transaction.totalFee ?? 0), 0);
+  const currentMarks = new Map(
+    currentPositions(db, accountId).map((position) => [
+      `${position.instrument}:${position.direction}`,
+      position.marketPrice,
+    ]),
+  );
   const openTrades = db.select().from(schema.trades).where(eq(schema.trades.accountId, accountId)).all().filter((trade) => trade.status !== "CLOSED");
   const risk = openTrades.reduce((total, trade) => {
     const openQuantity = Math.max(0, trade.totalEntryQuantity - trade.totalExitQuantity);
     const multiplier = trade.multiplierSatangPerPoint ?? 20_000;
-    const notional = Math.trunc(((trade.averageEntryPrice ?? 0) * multiplier * openQuantity) / 100);
-    return { notional: total.notional + notional, margin: total.margin + (trade.initialMarginPerContract ?? 0) * openQuantity };
-  }, { notional: 0, margin: 0 });
-  const equity = parseMoneyOrZero(account.equityBalance);
+    const mark = currentMarks.get(`${trade.instrument}:${trade.direction}`);
+    const priceForExposure = mark ?? trade.averageEntryPrice ?? 0;
+    return { notional: total.notional + Math.trunc((priceForExposure * multiplier * openQuantity) / 100) };
+  }, { notional: 0 });
+  const positionSummary = positionTotals(db, accountId);
+  const equity = Number(account.equityBalance) * 100;
 
   return {
     portfolioEquity: account.equityBalance,
@@ -29,7 +46,7 @@ export function dashboardSummary(db: Db, accountId: number) {
     totalDeposits: cashFlow.totalDeposits,
     totalWithdrawals: cashFlow.totalWithdrawals,
     netCapitalFlow: cashFlow.netCapitalFlow,
-    totalFees: analytics.totalFees,
+    totalFees: money(totalFees) ?? "0",
     winRate: analytics.winRate,
     profitFactor: analytics.profitFactor,
     expectancy: analytics.expectancy,
@@ -37,7 +54,7 @@ export function dashboardSummary(db: Db, accountId: number) {
     maxDrawdown: equityCurve(db, accountId).maxDrawdown,
     notionalExposure: money(risk.notional) ?? "0",
     effectiveLeverage: equity > 0 ? risk.notional / equity : null,
-    marginUsed: money(risk.margin) ?? "0",
-    marginUtilization: equity > 0 ? risk.margin / equity : null,
+    marginUsed: money(positionSummary.marginUsed) ?? "0",
+    marginUtilization: equity > 0 ? positionSummary.marginUsed / equity : null,
   };
 }

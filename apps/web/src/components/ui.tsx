@@ -152,7 +152,7 @@ export function DirectionBadge({ direction }: { direction: string }) {
   return (
     <span
       className={`inline-flex items-center rounded-full px-3 py-1 text-xs font-bold ${
-        isLong ? "bg-success-soft text-success" : "bg-critical-soft text-critical"
+        isLong ? "bg-primary-soft text-primary" : "bg-critical-soft text-critical"
       }`}
     >
       {direction}

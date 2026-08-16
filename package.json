@@ -6,6 +6,7 @@
   "description": "TFEX Trading Journal — personal trading intelligence platform",
   "scripts": {
     "dev": "pnpm --parallel --filter @tfex/api --filter @tfex/web dev",
+    "tfex": "bash scripts/tfex",
     "dev:api": "pnpm --filter @tfex/api dev",
     "dev:web": "pnpm --filter @tfex/web dev",
     "build": "pnpm -r build",
