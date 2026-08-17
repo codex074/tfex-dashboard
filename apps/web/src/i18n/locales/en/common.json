@@ -98,6 +98,7 @@
     "deleteConfirm": "Delete account \"{{name}}\"? It can be restored within 24 hours.",
     "deletedAccounts": "Recently deleted",
     "restore": "Restore",
+    "restoreConfirm": "Restore account \"{{name}}\"?",
     "restoring": "Restoring…",
     "restoreIn": "Deletes permanently in {{time}}"
   },

@@ -2,6 +2,7 @@ import { type FormEvent, type ReactNode, useEffect, useState } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useTranslation } from "react-i18next";
 import { useAuth } from "../auth/AuthContext";
+import Swal from "sweetalert2";
 import { api, type Account, type Broker, type BrokerContractTerm, type Instrument, type InstrumentContractSpec, type UserPreferences } from "../services/api";
 import { PageTitle, SearchableCheckboxGroup } from "../components/ui";
 import { useAccounts } from "../hooks/useAccounts";
@@ -84,7 +85,18 @@ export function SettingsPage() {
                   {a.name}
                   {a.accountNumber ? <span className="text-stone"> · {a.accountNumber}</span> : null}
                 </span>
-                <button type="button" className="rounded-full bg-critical-soft px-3 py-1 text-xs font-bold text-critical" disabled={deleteAccount.isPending} onClick={() => { if (window.confirm(t("account.deleteConfirm", { name: a.name }))) deleteAccount.mutate(a.id); }}>
+                <button type="button" className="rounded-full bg-critical-soft px-3 py-1 text-xs font-bold text-critical" disabled={deleteAccount.isPending} onClick={() => {
+                  void Swal.fire({
+                    title: t("account.delete"),
+                    text: t("account.deleteConfirm", { name: a.name }),
+                    icon: "warning",
+                    showCancelButton: true,
+                    confirmButtonColor: "#dc2626",
+                    cancelButtonColor: "#5b6673",
+                    confirmButtonText: t("account.delete"),
+                    cancelButtonText: t("common.cancel"),
+                  }).then((result) => { if (result.isConfirmed) deleteAccount.mutate(a.id); });
+                }}>
                   {t("account.delete")}
                 </button>
               </div>
@@ -154,7 +166,18 @@ function DeletedAccountRow({ account, now, busy, onRestore }: { account: Account
         type="button"
         className="rounded-full bg-success px-4 py-1.5 text-xs font-bold text-canvas disabled:opacity-60"
         disabled={busy}
-        onClick={onRestore}
+        onClick={() => {
+          void Swal.fire({
+            title: t("account.restore"),
+            text: t("account.restoreConfirm", { name: account.name }),
+            icon: "question",
+            showCancelButton: true,
+            confirmButtonColor: "#0a8f3c",
+            cancelButtonColor: "#5b6673",
+            confirmButtonText: t("account.restore"),
+            cancelButtonText: t("common.cancel"),
+          }).then((result) => { if (result.isConfirmed) onRestore(); });
+        }}
       >
         {busy ? t("account.restoring") : `↩ ${t("account.restore")}`}
       </button>

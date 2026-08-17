@@ -98,6 +98,7 @@
     "deleteConfirm": "ลบบัญชี \"{{name}}\"? คุณสามารถกู้คืนได้ภายใน 24 ชั่วโมง",
     "deletedAccounts": "ลบล่าสุด",
     "restore": "กู้คืน",
+    "restoreConfirm": "กู้คืนบัญชี \"{{name}}\"?",
     "restoring": "กำลังกู้คืน…",
     "restoreIn": "จะลบถาวรใน {{time}}"
   },

@@ -3,6 +3,7 @@ import ReactDOM from "react-dom/client";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter } from "react-router-dom";
 import "./index.css";
+import "sweetalert2/dist/sweetalert2.min.css";
 import { initI18n } from "./i18n";
 import App from "./App";
 import { AuthProvider } from "./auth/AuthContext";
