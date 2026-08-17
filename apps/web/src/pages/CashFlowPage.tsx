@@ -9,7 +9,6 @@ import {
   Loading,
   NoAccountState,
   PageTitle,
-  StatCard,
 } from "../components/ui";
 import { formatMoney, formatDate } from "../utils/format";
 
@@ -77,30 +76,89 @@ export function CashFlowPage() {
   }
 
   const s = summary.data;
+  const net = Number(s.netCapitalFlow);
 
   return (
     <div className="space-y-10">
-      <PageTitle title={t("cashflow.title")} actions={<><button className="rounded-full border border-hairline-soft px-4 py-2 text-sm font-bold text-ink transition-colors hover:bg-surface-soft" onClick={() => { setEditingId(null); setType("WITHDRAWAL"); }}>{t("cashflow.withdraw")}</button><button className="rounded-full bg-ink-deep px-4 py-2 text-sm font-bold text-canvas transition-colors hover:bg-charcoal" onClick={() => { setEditingId(null); setType("DEPOSIT"); }}>{t("cashflow.deposit")}</button></>} />
+      <PageTitle title={t("cashflow.title")} actions={<><button className="rounded-full border border-hairline-soft bg-canvas px-4 py-2 text-sm font-bold text-critical transition-colors hover:bg-rose-soft" onClick={() => { setEditingId(null); setType("WITHDRAWAL"); }}>{t("cashflow.withdraw")}</button><button className="rounded-full bg-ink-deep px-4 py-2 text-sm font-bold text-canvas transition-colors hover:bg-charcoal" onClick={() => { setEditingId(null); setType("DEPOSIT"); }}>{t("cashflow.deposit")}</button></>} />
 
-      <div className="grid grid-cols-1 gap-6 md:grid-cols-3">
-        <StatCard
-          label={t("cashflow.summary.totalDeposits")}
-          value={formatMoney(s.totalDeposits, lang)}
-        />
-        <StatCard
-          label={t("cashflow.summary.totalWithdrawals")}
-          value={formatMoney(s.totalWithdrawals, lang)}
-        />
-        <StatCard
-          label={t("cashflow.summary.netCapitalFlow")}
-          value={formatMoney(s.netCapitalFlow, lang)}
-          accent
-        />
-      </div>
+      <section className="grid gap-4 lg:grid-cols-12">
+        <div className="relative overflow-hidden rounded-feature bg-gradient-to-br from-ink-deep via-[#102c45] to-primary-deep p-7 text-canvas lg:col-span-5 lg:p-8">
+          <p className="text-sm font-medium text-canvas/65">
+            {t("cashflow.summary.netCapitalFlow")}
+          </p>
+          <p className={`mt-3 text-3xl font-medium tracking-tight sm:text-[42px] ${net >= 0 ? "text-[#8ee3b4]" : "text-[#ffb4b4]"}`}>
+            {formatMoney(s.netCapitalFlow, lang)}
+          </p>
+          <dl className="mt-6 grid grid-cols-2 gap-3 border-t border-canvas/15 pt-5">
+            <div>
+              <dt className="text-xs text-canvas/55">
+                {t("cashflow.summary.totalDeposits")}
+              </dt>
+              <dd className="mt-1 text-base font-medium text-[#8ee3b4]">
+                +{formatMoney(s.totalDeposits, lang)}
+              </dd>
+            </div>
+            <div>
+              <dt className="text-xs text-canvas/55">
+                {t("cashflow.summary.totalWithdrawals")}
+              </dt>
+              <dd className="mt-1 text-base font-medium text-[#ffb4b4]">
+                −{formatMoney(s.totalWithdrawals, lang)}
+              </dd>
+            </div>
+          </dl>
+        </div>
+
+        <div className="rounded-xxxl border border-success/20 bg-mint-soft p-7 lg:col-span-3">
+          <p className="text-sm font-medium text-steel">
+            {t("cashflow.summary.totalDeposits")}
+          </p>
+          <p className="mt-3 text-2xl font-medium tracking-tight text-success">
+            {formatMoney(s.totalDeposits, lang)}
+          </p>
+        </div>
+
+        <div className="rounded-xxxl border border-critical/15 bg-rose-soft p-7 lg:col-span-4">
+          <p className="text-sm font-medium text-steel">
+            {t("cashflow.summary.totalWithdrawals")}
+          </p>
+          <p className="mt-3 text-2xl font-medium tracking-tight text-critical">
+            {formatMoney(s.totalWithdrawals, lang)}
+          </p>
+        </div>
+      </section>
+
+      <section className="grid gap-4 sm:grid-cols-2">
+        <div className="rounded-xxxl border border-attention/20 bg-amber-soft p-6">
+          <p className="text-sm font-medium text-steel">
+            {t("cashflow.summary.totalInterest")}
+          </p>
+          <p className="mt-3 text-2xl font-medium tracking-tight text-attention">
+            {formatMoney(s.totalInterest, lang)}
+          </p>
+        </div>
+        <div className="rounded-xxxl border border-hairline-soft bg-canvas p-6">
+          <p className="text-sm font-medium text-steel">
+            {t("cashflow.summary.totalAdjustments")}
+          </p>
+          <p className="mt-3 text-2xl font-medium tracking-tight text-ink-deep">
+            {formatMoney(s.totalAdjustments, lang)}
+          </p>
+        </div>
+      </section>
 
       {type ? <div className="fixed inset-0 z-30 flex items-center justify-center bg-ink-deep/30 p-4"><form className="w-full max-w-md rounded-xxxl bg-canvas p-6 shadow-xl" onSubmit={submitCashFlow}><h2 className="text-xl font-medium text-ink-deep">{editingId === null ? (type === "DEPOSIT" ? t("cashflow.deposit") : t("cashflow.withdraw")) : t("cashflow.edit")}</h2><label className="mt-5 block text-sm font-medium text-ink">{t("cashflow.columns.date")}<input className="mt-1.5 w-full rounded-xl border border-hairline-soft px-3 py-2.5" type="date" value={transactionDate} onChange={(event) => setTransactionDate(event.target.value)} required /></label><label className="mt-4 block text-sm font-medium text-ink">{t("cashflow.columns.amount")}<input className="mt-1.5 w-full rounded-xl border border-hairline-soft px-3 py-2.5" type="number" min="0.01" step="0.01" value={amount} onChange={(event) => setAmount(event.target.value)} required /></label><label className="mt-4 block text-sm font-medium text-ink">{t("cashflow.columns.reference")}<input className="mt-1.5 w-full rounded-xl border border-hairline-soft px-3 py-2.5" value={reference} onChange={(event) => setReference(event.target.value)} /></label><label className="mt-4 block text-sm font-medium text-ink">{t("cashflow.columns.note")}<textarea className="mt-1.5 w-full rounded-xl border border-hairline-soft px-3 py-2.5" value={note} onChange={(event) => setNote(event.target.value)} rows={3} /></label>{saveCashFlow.isError ? <p className="mt-3 text-sm text-critical">{t("cashflow.saveError")}</p> : null}<div className="mt-6 flex justify-end gap-3"><button type="button" className="rounded-full px-4 py-2 text-sm font-bold text-ink transition-colors hover:bg-surface-soft" onClick={() => setType(null)}>{t("common.cancel")}</button><button className="rounded-full bg-ink-deep px-4 py-2 text-sm font-bold text-canvas transition-colors hover:bg-charcoal disabled:cursor-not-allowed disabled:opacity-60" disabled={saveCashFlow.isPending}>{saveCashFlow.isPending ? t("cashflow.saving") : t("common.save")}</button></div></form></div> : null}
 
-      <div className="rounded-xxxl border border-hairline-soft bg-canvas">
+      <div className="overflow-hidden rounded-xxxl border border-hairline-soft bg-canvas">
+        <div className="flex flex-wrap items-end justify-between gap-3 border-b border-hairline-soft px-8 py-6">
+          <h2 className="text-[24px] font-medium leading-tight text-ink-deep">
+            {t("cashflow.columns.type")}
+          </h2>
+          <span className="rounded-full bg-surface-soft px-3 py-1 text-xs font-bold text-steel">
+            {(transactions.data ?? []).length}
+          </span>
+        </div>
         <div className="overflow-x-auto">
           <table className="w-full text-sm">
             <thead>
@@ -129,6 +187,7 @@ export function CashFlowPage() {
                       tx.type === "WITHDRAWAL" ? "text-critical" : "text-success"
                     }`}
                   >
+                    {tx.type === "WITHDRAWAL" ? "−" : "+"}
                     {formatMoney(tx.amount, lang)}
                   </td>
                   <td className="px-8 py-4 text-slate">{tx.reference ?? "—"}</td>

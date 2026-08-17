@@ -27,6 +27,28 @@ const timestamps = {
     .default(sql`(strftime('%Y-%m-%dT%H:%M:%fZ','now'))`),
 };
 
+export const users = sqliteTable("users", {
+  id: integer("id").primaryKey({ autoIncrement: true }),
+  email: text("email").notNull().unique(),
+  displayName: text("display_name").notNull(),
+  passwordHash: text("password_hash").notNull(),
+  role: text("role").notNull().default("USER"), // ADMIN | USER
+  isActive: integer("is_active", { mode: "boolean" }).notNull().default(true),
+  ...timestamps,
+});
+
+export const authSessions = sqliteTable(
+  "auth_sessions",
+  {
+    id: integer("id").primaryKey({ autoIncrement: true }),
+    userId: integer("user_id").notNull().references(() => users.id, { onDelete: "cascade" }),
+    tokenHash: text("token_hash").notNull().unique(),
+    expiresAt: text("expires_at").notNull(),
+    createdAt: text("created_at").notNull().default(sql`(strftime('%Y-%m-%dT%H:%M:%fZ','now'))`),
+  },
+  (table) => ({ authSessionsUserIdx: index("auth_sessions_user_idx").on(table.userId) }),
+);
+
 export const brokers = sqliteTable("brokers", {
   id: integer("id").primaryKey({ autoIncrement: true }),
   name: text("name").notNull(),
@@ -34,7 +56,42 @@ export const brokers = sqliteTable("brokers", {
   ...timestamps,
 });
 
-/** Exchange-level contract terms; values are versioned by effective date. */
+/** Admin-maintained instrument families exposed in user dropdowns. */
+export const instruments = sqliteTable("instruments", {
+  id: integer("id").primaryKey({ autoIncrement: true }),
+  code: text("code").notNull().unique(),
+  name: text("name").notNull(),
+  isActive: integer("is_active", { mode: "boolean" }).notNull().default(true),
+  ...timestamps,
+});
+
+export const userBrokers = sqliteTable(
+  "user_brokers",
+  {
+    userId: integer("user_id").notNull().references(() => users.id, { onDelete: "cascade" }),
+    brokerId: integer("broker_id").notNull().references(() => brokers.id, { onDelete: "cascade" }),
+  },
+  (table) => ({ userBrokersPk: primaryKey({ columns: [table.userId, table.brokerId] }) }),
+);
+
+export const userInstruments = sqliteTable(
+  "user_instruments",
+  {
+    userId: integer("user_id").notNull().references(() => users.id, { onDelete: "cascade" }),
+    instrumentId: integer("instrument_id").notNull().references(() => instruments.id, { onDelete: "cascade" }),
+  },
+  (table) => ({ userInstrumentsPk: primaryKey({ columns: [table.userId, table.instrumentId] }) }),
+);
+
+/**
+ * Exchange-level contract terms; values are versioned by effective date.
+ *
+ * `multiplierSatangPerPoint` is the THB (integer satang) value of a one-point
+ * price move for one contract. Margin rates are stored as integer basis points
+ * (1% = 100 bps) because the Thailand Clearing House publishes margin as a
+ * percentage of contract value, recomputed daily from the underlying price.
+ * Effective leverage is derived (10_000 / initialMarginRateBps), never stored.
+ */
 export const instrumentContractSpecs = sqliteTable(
   "instrument_contract_specs",
   {
@@ -42,6 +99,8 @@ export const instrumentContractSpecs = sqliteTable(
     instrumentFamily: text("instrument_family").notNull(),
     multiplierSatangPerPoint: integer("multiplier_satang_per_point").notNull(),
     tickSizePoints: integer("tick_size_points").notNull().default(10),
+    initialMarginRateBps: integer("initial_margin_rate_bps"),
+    maintenanceMarginRateBps: integer("maintenance_margin_rate_bps"),
     effectiveDate: text("effective_date").notNull(),
     isActive: integer("is_active", { mode: "boolean" }).notNull().default(true),
     ...timestamps,
@@ -79,6 +138,7 @@ export const accounts = sqliteTable(
   "accounts",
   {
     id: integer("id").primaryKey({ autoIncrement: true }),
+    userId: integer("user_id").references(() => users.id, { onDelete: "cascade" }),
     name: text("name").notNull(),
     brokerId: integer("broker_id").references(() => brokers.id, {
       onDelete: "set null",
@@ -93,6 +153,7 @@ export const accounts = sqliteTable(
   },
   (table) => ({
     accountsBrokerIdx: index("accounts_broker_idx").on(table.brokerId),
+    accountsUserIdx: index("accounts_user_idx").on(table.userId),
   }),
 );
 
@@ -181,6 +242,9 @@ export const trades = sqliteTable(
     accountId: integer("account_id")
       .notNull()
       .references(() => accounts.id, { onDelete: "cascade" }),
+    brokerId: integer("broker_id").references(() => brokers.id, {
+      onDelete: "set null",
+    }),
     instrument: text("instrument").notNull(),
     direction: text("direction").notNull(), // LONG | SHORT
 
@@ -380,9 +444,20 @@ export const attachments = sqliteTable("attachments", {
 
 export const brokersRelations = relations(brokers, ({ many }) => ({
   accounts: many(accounts),
+  users: many(userBrokers),
 }));
 
+export const usersRelations = relations(users, ({ many }) => ({
+  sessions: many(authSessions),
+  accounts: many(accounts),
+  brokers: many(userBrokers),
+  instruments: many(userInstruments),
+}));
+
+export const instrumentsRelations = relations(instruments, ({ many }) => ({ users: many(userInstruments) }));
+
 export const accountsRelations = relations(accounts, ({ one, many }) => ({
+  user: one(users, { fields: [accounts.userId], references: [users.id] }),
   broker: one(brokers, {
     fields: [accounts.brokerId],
     references: [brokers.id],
@@ -474,6 +549,10 @@ export const strategiesRelations = relations(strategies, ({ many }) => ({
 
 export type Broker = typeof brokers.$inferSelect;
 export type NewBroker = typeof brokers.$inferInsert;
+export type User = typeof users.$inferSelect;
+export type NewUser = typeof users.$inferInsert;
+export type Instrument = typeof instruments.$inferSelect;
+export type NewInstrument = typeof instruments.$inferInsert;
 export type InstrumentContractSpec = typeof instrumentContractSpecs.$inferSelect;
 export type NewInstrumentContractSpec = typeof instrumentContractSpecs.$inferInsert;
 export type BrokerContractTerm = typeof brokerContractTerms.$inferSelect;
@@ -503,7 +582,12 @@ export type Attachment = typeof attachments.$inferSelect;
 export type NewAttachment = typeof attachments.$inferInsert;
 
 export type Schema = {
+  users: typeof users;
+  authSessions: typeof authSessions;
   brokers: typeof brokers;
+  instruments: typeof instruments;
+  userBrokers: typeof userBrokers;
+  userInstruments: typeof userInstruments;
   instrumentContractSpecs: typeof instrumentContractSpecs;
   brokerContractTerms: typeof brokerContractTerms;
   accounts: typeof accounts;

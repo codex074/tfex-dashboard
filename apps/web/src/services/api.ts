@@ -4,6 +4,7 @@
  */
 
 const BASE_URL = import.meta.env.VITE_API_URL ?? "/api";
+export const AUTH_TOKEN_KEY = "tfex.authToken";
 
 export interface ApiErrorBody {
   error: { code: string; message: string };
@@ -22,10 +23,12 @@ export class ApiClientError extends Error {
 }
 
 async function request<T>(path: string, init?: RequestInit): Promise<T> {
+  const token = typeof window === "undefined" ? null : window.localStorage.getItem(AUTH_TOKEN_KEY);
   const res = await fetch(`${BASE_URL}${path}`, {
     ...init,
     headers: {
       "Content-Type": "application/json",
+      ...(token ? { Authorization: `Bearer ${token}` } : {}),
       ...(init?.headers ?? {}),
     },
   });
@@ -91,7 +94,10 @@ export interface Account {
 }
 
 export interface Broker { id: number; name: string; shortName: string }
-export interface InstrumentContractSpec { id: number; instrumentFamily: string; multiplier: string; tickSize: string; effectiveDate: string; isActive: boolean }
+export interface Instrument { id: number; code: string; name: string; isActive: boolean }
+export interface AuthUser { id: number; email: string; displayName: string; role: "ADMIN" | "USER"; isActive: boolean }
+export interface UserPreferences { brokers: Broker[]; instruments: Instrument[] }
+export interface InstrumentContractSpec { id: number; instrumentFamily: string; multiplier: string; tickSize: string; initialMarginRate: string | null; maintenanceMarginRate: string | null; effectiveDate: string; isActive: boolean }
 export interface BrokerContractTerm { id: number; brokerId: number; instrumentFamily: string; initialMargin: string; maintenanceMargin: string; commission: string; tradingFee: string; clearingFee: string; regulatoryFee: string; vat: string; otherFee: string; effectiveDate: string; isActive: boolean }
 
 export interface AccountSummary {
@@ -142,7 +148,9 @@ export interface Trade {
   grossPnl: string;
   totalFees: string;
   netPnl: string;
+  unrealizedPnl: string | null;
   holdingDurationSeconds: number | null;
+  holdingDays: number | null;
   strategyId: number | null;
   createdAt: string;
   updatedAt: string;
@@ -257,6 +265,7 @@ export interface Position {
   averagePrice: string;
   marketPrice: string | null;
   unrealizedPnl: string;
+  marginUsed: string;
   updatedAt: string;
 }
 

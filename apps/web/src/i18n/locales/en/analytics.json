@@ -1,5 +1,8 @@
 {
   "title": "Analytics",
+  "overview": { "title": "Performance at a glance", "subtitle": "A concise view of trade results and consistency" },
+  "outcomes": { "title": "Profit & loss distribution", "subtitle": "See the shape of wins, losses, and trading costs" },
+  "contracts": "contracts",
   "summary": {
     "totalTrades": "Total Trades",
     "winningTrades": "Winning Trades",

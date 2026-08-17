@@ -1,5 +1,8 @@
 {
   "title": "Dashboard",
+  "overview": { "title": "Portfolio overview", "subtitle": "Your account value and capital movement at a glance" },
+  "performance": { "title": "Trading performance", "subtitle": "Closed-trade quality and costs" },
+  "risk": { "title": "Risk & exposure", "subtitle": "Current position sizing and margin usage" },
   "cards": {
     "portfolioEquity": "Portfolio Equity",
     "cashBalance": "Cash Balance",

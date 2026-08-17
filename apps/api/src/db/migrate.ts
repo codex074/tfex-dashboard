@@ -11,6 +11,18 @@ import { sql } from "drizzle-orm";
  */
 
 const CREATE_STATEMENTS = [
+  `CREATE TABLE IF NOT EXISTS users (
+    id INTEGER PRIMARY KEY AUTOINCREMENT, email TEXT NOT NULL UNIQUE, display_name TEXT NOT NULL,
+    password_hash TEXT NOT NULL, role TEXT NOT NULL DEFAULT 'USER', is_active INTEGER NOT NULL DEFAULT 1,
+    created_at TEXT NOT NULL DEFAULT (strftime('%Y-%m-%dT%H:%M:%fZ','now')),
+    updated_at TEXT NOT NULL DEFAULT (strftime('%Y-%m-%dT%H:%M:%fZ','now'))
+  )`,
+  `CREATE TABLE IF NOT EXISTS auth_sessions (
+    id INTEGER PRIMARY KEY AUTOINCREMENT, user_id INTEGER NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+    token_hash TEXT NOT NULL UNIQUE, expires_at TEXT NOT NULL,
+    created_at TEXT NOT NULL DEFAULT (strftime('%Y-%m-%dT%H:%M:%fZ','now'))
+  )`,
+  `CREATE INDEX IF NOT EXISTS auth_sessions_user_idx ON auth_sessions (user_id)`,
   `CREATE TABLE IF NOT EXISTS brokers (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     name TEXT NOT NULL,
@@ -18,8 +30,24 @@ const CREATE_STATEMENTS = [
     created_at TEXT NOT NULL DEFAULT (strftime('%Y-%m-%dT%H:%M:%fZ','now')),
     updated_at TEXT NOT NULL DEFAULT (strftime('%Y-%m-%dT%H:%M:%fZ','now'))
   )`,
+  `CREATE TABLE IF NOT EXISTS instruments (
+    id INTEGER PRIMARY KEY AUTOINCREMENT, code TEXT NOT NULL UNIQUE, name TEXT NOT NULL, is_active INTEGER NOT NULL DEFAULT 1,
+    created_at TEXT NOT NULL DEFAULT (strftime('%Y-%m-%dT%H:%M:%fZ','now')),
+    updated_at TEXT NOT NULL DEFAULT (strftime('%Y-%m-%dT%H:%M:%fZ','now'))
+  )`,
+  `CREATE TABLE IF NOT EXISTS user_brokers (
+    user_id INTEGER NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+    broker_id INTEGER NOT NULL REFERENCES brokers(id) ON DELETE CASCADE,
+    PRIMARY KEY (user_id, broker_id)
+  )`,
+  `CREATE TABLE IF NOT EXISTS user_instruments (
+    user_id INTEGER NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+    instrument_id INTEGER NOT NULL REFERENCES instruments(id) ON DELETE CASCADE,
+    PRIMARY KEY (user_id, instrument_id)
+  )`,
   `CREATE TABLE IF NOT EXISTS accounts (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
+    user_id INTEGER REFERENCES users(id) ON DELETE CASCADE,
     name TEXT NOT NULL,
     broker_id INTEGER REFERENCES brokers(id) ON DELETE SET NULL,
     account_number TEXT,
@@ -52,6 +80,7 @@ const CREATE_STATEMENTS = [
   `CREATE TABLE IF NOT EXISTS cash_transactions (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     account_id INTEGER NOT NULL REFERENCES accounts(id) ON DELETE CASCADE,
+    broker_id INTEGER REFERENCES brokers(id) ON DELETE SET NULL,
     type TEXT NOT NULL,
     transaction_date TEXT NOT NULL,
     amount INTEGER NOT NULL,
@@ -218,6 +247,11 @@ export function migrate() {
       "ALTER TABLE trades ADD COLUMN instrument_family TEXT",
       "ALTER TABLE trades ADD COLUMN multiplier_satang_per_point INTEGER",
       "ALTER TABLE trades ADD COLUMN initial_margin_per_contract INTEGER",
+      "ALTER TABLE trades ADD COLUMN broker_id INTEGER REFERENCES brokers(id) ON DELETE SET NULL",
+      "ALTER TABLE accounts ADD COLUMN user_id INTEGER REFERENCES users(id) ON DELETE CASCADE",
+      "CREATE INDEX IF NOT EXISTS accounts_user_idx ON accounts (user_id)",
+      "ALTER TABLE instrument_contract_specs ADD COLUMN initial_margin_rate_bps INTEGER",
+      "ALTER TABLE instrument_contract_specs ADD COLUMN maintenance_margin_rate_bps INTEGER",
     ]) {
       try { tx.run(sql.raw(statement)); } catch { /* column already exists */ }
     }

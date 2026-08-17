@@ -23,6 +23,8 @@
   "summary": {
     "totalDeposits": "เงินฝากรวม",
     "totalWithdrawals": "เงินถอนรวม",
-    "netCapitalFlow": "กระแสเงินสุทธิ"
+    "netCapitalFlow": "กระแสเงินสุทธิ",
+    "totalInterest": "ดอกเบี้ยรวม",
+    "totalAdjustments": "รายการปรับปรุงรวม"
   }
 }

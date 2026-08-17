@@ -10,30 +10,39 @@ export function LanguageSwitcher() {
   };
 
   const current = i18n.language.startsWith("th") ? "th" : "en";
+  const isTh = current === "th";
 
   return (
-    <div className="flex items-center gap-1 rounded-full border border-hairline bg-surface-soft p-1">
+    <div
+      className="relative flex h-9 w-24 items-center rounded-full border border-hairline bg-surface-soft p-1"
+      role="group"
+      aria-label="Language"
+    >
+      <span
+        aria-hidden="true"
+        className={`absolute bottom-1 top-1 left-1 w-[calc(50%-4px)] rounded-full bg-gradient-to-r from-ink-deep to-primary-deep shadow-sm transition-transform duration-200 ease-out ${
+          isTh ? "translate-x-0" : "translate-x-full"
+        }`}
+      />
       <button
         type="button"
         onClick={() => switchTo("th")}
-        className={`rounded-full px-3 py-1 text-sm font-bold transition-colors ${
-          current === "th"
-            ? "bg-ink-deep text-canvas"
-            : "text-ink hover:bg-canvas"
+        className={`relative z-10 flex h-full w-1/2 shrink-0 items-center justify-center rounded-full text-xs font-bold leading-none transition-colors ${
+          isTh ? "text-canvas" : "text-ink hover:text-ink-deep"
         }`}
         aria-label={t("language.thai")}
+        aria-pressed={isTh}
       >
         ไทย
       </button>
       <button
         type="button"
         onClick={() => switchTo("en")}
-        className={`rounded-full px-3 py-1 text-sm font-bold transition-colors ${
-          current === "en"
-            ? "bg-ink-deep text-canvas"
-            : "text-ink hover:bg-canvas"
+        className={`relative z-10 flex h-full w-1/2 shrink-0 items-center justify-center rounded-full text-xs font-bold leading-none transition-colors ${
+          !isTh ? "text-canvas" : "text-ink hover:text-ink-deep"
         }`}
         aria-label={t("language.english")}
+        aria-pressed={!isTh}
       >
         EN
       </button>

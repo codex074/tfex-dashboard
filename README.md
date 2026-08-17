@@ -68,6 +68,12 @@ pnpm dev
 
 Open http://localhost:5173. The Vite dev server proxies `/api` to the backend.
 
+### Quick launcher
+
+Run `pnpm tfex` to start both services. It prefers API port 4000 and web port
+5173, then automatically uses the next available port if either is occupied.
+The selected web URL is printed in the terminal.
+
 ### Individual commands
 
 ```bash

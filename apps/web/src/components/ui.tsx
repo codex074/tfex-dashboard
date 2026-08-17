@@ -1,7 +1,32 @@
-import type { ReactNode } from "react";
+import { useState, type InputHTMLAttributes, type ReactNode } from "react";
 import { Link } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import { formatMoney, formatPercent, formatProfitFactor } from "../utils/format";
+
+export function PasswordInput({
+  className = "",
+  ...inputProps
+}: Omit<InputHTMLAttributes<HTMLInputElement>, "type"> & { className?: string }) {
+  const { t } = useTranslation();
+  const [visible, setVisible] = useState(false);
+  return (
+    <div className="relative">
+      <input
+        {...inputProps}
+        type={visible ? "text" : "password"}
+        className={`${className} pr-11`}
+      />
+      <button
+        type="button"
+        onClick={() => setVisible((v) => !v)}
+        aria-label={visible ? t("auth.hidePassword") : t("auth.showPassword")}
+        className="absolute inset-y-0 right-0 flex items-center px-3 text-sm text-slate hover:text-ink"
+      >
+        {visible ? "🙈" : "👁️"}
+      </button>
+    </div>
+  );
+}
 
 export function Card({
   title,
@@ -152,7 +177,7 @@ export function DirectionBadge({ direction }: { direction: string }) {
   return (
     <span
       className={`inline-flex items-center rounded-full px-3 py-1 text-xs font-bold ${
-        isLong ? "bg-success-soft text-success" : "bg-critical-soft text-critical"
+        isLong ? "bg-primary-soft text-primary" : "bg-critical-soft text-critical"
       }`}
     >
       {direction}

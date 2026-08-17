@@ -59,7 +59,10 @@ export function formatDate(
     return "—";
   }
   const locale = lang === "th" ? "th-TH" : "en-US";
-  const d = new Date(`${date}T00:00:00`);
+  // Trading dates are date-only values, not local timestamps. Parse at UTC
+  // midnight so rendering with timeZone: "UTC" cannot shift Thailand dates
+  // back by one day.
+  const d = new Date(`${date}T00:00:00Z`);
   if (Number.isNaN(d.getTime())) {
     return date;
   }

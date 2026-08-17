@@ -1,11 +1,15 @@
 import type { FastifyInstance } from "fastify";
-import { createBrokerTransactionSchema } from "@tfex/shared";
+import { createBrokerTransactionSchema, updateManualBrokerTransactionSchema } from "@tfex/shared";
+import { eq } from "drizzle-orm";
 import type { Db } from "../db/client.js";
 import {
   createBrokerTransaction,
   listBrokerTransactions,
   toBrokerTransactionDto,
+  updateBrokerTransaction,
 } from "../services/transaction.service.js";
+import { recomputeTrade } from "../services/trade.service.js";
+import * as schema from "../db/schema.js";
 
 export function registerTransactionRoutes(app: FastifyInstance, db: Db) {
   app.post("/api/transactions", async (request) => {
@@ -29,5 +33,21 @@ export function registerTransactionRoutes(app: FastifyInstance, db: Db) {
         toBrokerTransactionDto,
       ),
     };
+  });
+
+  app.patch("/api/transactions/:id", async (request) => {
+    const { id } = request.params as { id: string };
+    const transactionId = Number(id);
+    const parsed = updateManualBrokerTransactionSchema.parse(request.body);
+    const mapping = db
+      .select({ tradeId: schema.tradeTransactions.tradeId })
+      .from(schema.tradeTransactions)
+      .where(eq(schema.tradeTransactions.brokerTransactionId, transactionId))
+      .get();
+    const transaction = updateBrokerTransaction(db, transactionId, parsed);
+    if (mapping) {
+      recomputeTrade(db, mapping.tradeId);
+    }
+    return { data: toBrokerTransactionDto(transaction) };
   });
 }

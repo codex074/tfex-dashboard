@@ -1,0 +1,6 @@
+# Add this site block to /home/codex/pharmshift/deploy/Caddyfile on the VPS.
+# The upstream is the unique container name, never a Compose service alias.
+tfexdash.codex074.tech {
+	encode gzip
+	reverse_proxy tfexdash-web:80
+}

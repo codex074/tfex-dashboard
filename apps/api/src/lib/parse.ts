@@ -32,3 +32,22 @@ export function parsePriceOrZero(
   const parsed = parsePrice(value);
   return parsed ?? 0;
 }
+
+/**
+ * Convert a percentage string ("8.5") to integer basis points (850).
+ * Margin rates are published as percent-of-contract-value.
+ */
+export function parseBps(
+  value: string | null | undefined,
+): number | null {
+  if (value === null || value === undefined || value.trim() === "") {
+    return null;
+  }
+  const normalized = value.trim();
+  if (!/^\d+(\.\d+)?$/.test(normalized)) {
+    throw new Error("Margin rate must be a non-negative percentage");
+  }
+  const [whole, frac = ""] = normalized.split(".") as [string, string?];
+  const fracPadded = (frac + "0000").slice(0, 4);
+  return Number(whole) * 10_000 + Number(fracPadded);
+}
