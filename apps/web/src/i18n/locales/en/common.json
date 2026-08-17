@@ -101,6 +101,19 @@
     "add": "Add broker",
     "adding": "Adding…"
   },
+  "onboarding": {
+    "title": "Setup your account",
+    "subtitle": "Complete these steps to start recording your trading activity.",
+    "step1": "Create account",
+    "step2": "Select broker",
+    "step3": "Frequently traded instruments",
+    "next": "Next",
+    "back": "Back",
+    "finish": "Finish",
+    "saving": "Saving…",
+    "done": "Setup complete. You can now start recording trades.",
+    "error": "Unable to complete setup. Please check your details."
+  },
   "common": {
     "loading": "Loading…",
     "error": "Something went wrong",

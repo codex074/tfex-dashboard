@@ -3,7 +3,7 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useTranslation } from "react-i18next";
 import { useAuth } from "../auth/AuthContext";
 import { api, type Broker, type BrokerContractTerm, type Instrument, type InstrumentContractSpec, type UserPreferences } from "../services/api";
-import { PageTitle } from "../components/ui";
+import { PageTitle, SearchableCheckboxGroup } from "../components/ui";
 
 const input = "mt-1 w-full rounded-xl border border-hairline-soft px-3 py-2 text-sm";
 const today = () => new Date().toISOString().slice(0, 10);
@@ -41,8 +41,8 @@ export function SettingsPage() {
     <PageTitle title={t("settings.title")} />
     <div className="grid gap-6 lg:grid-cols-2">
       <Card tone="account" emoji="⭐" title={t("settings.myDefaults")} subtitle={t("settings.myDefaultsHelp")}>
-        <ChoiceGroup label={t("brokers.title")} items={(brokers.data ?? []).map((x) => ({ id: x.id, label: `${x.name} (${x.shortName})` }))} selected={selectedBrokers} onChange={setSelectedBrokers} />
-        <ChoiceGroup label={t("settings.instruments")} items={(instruments.data ?? []).filter((x) => x.isActive).map((x) => ({ id: x.id, label: `${x.code} · ${x.name}` }))} selected={selectedInstruments} onChange={setSelectedInstruments} />
+        <SearchableCheckboxGroup label={t("brokers.title")} items={(brokers.data ?? []).map((x) => ({ id: x.id, label: `${x.name} (${x.shortName})` }))} selected={selectedBrokers} onChange={setSelectedBrokers} />
+        <SearchableCheckboxGroup label={t("settings.instruments")} items={(instruments.data ?? []).filter((x) => x.isActive).map((x) => ({ id: x.id, label: `${x.code} · ${x.name}` }))} selected={selectedInstruments} onChange={setSelectedInstruments} />
         <button className="mt-5 rounded-full bg-ink-deep px-4 py-2 text-sm font-bold text-canvas disabled:opacity-60" onClick={() => savePreferences.mutate()} disabled={savePreferences.isPending}>{savePreferences.isSuccess ? t("settings.saved") : t("settings.saveDefaults")}</button>
       </Card>
 
@@ -83,6 +83,5 @@ export function SettingsPage() {
 
 function Card({ tone, emoji, title, subtitle, children }: { tone: keyof typeof tones; emoji: string; title: string; subtitle: string; children: ReactNode }) { return <section className="overflow-hidden rounded-xxxl border border-hairline-soft bg-canvas"><div className={`flex items-center gap-3 border-b border-hairline-soft px-6 py-5 ${tones[tone]}`}><span className="text-xl">{emoji}</span><div><h2 className="text-xl font-medium">{title}</h2><p className="text-sm opacity-70">{subtitle}</p></div></div><div className="p-6">{children}</div></section>; }
 function Label({ text, children }: { text: string; children: ReactNode }) { return <label className="text-sm font-medium text-ink">{text}{children}</label>; }
-function ChoiceGroup({ label, items, selected, onChange }: { label: string; items: { id: number; label: string }[]; selected: number[]; onChange: (ids: number[]) => void }) { return <fieldset className="mt-4"><legend className="mb-2 text-sm font-bold text-ink">{label}</legend><div className="grid gap-2 sm:grid-cols-2">{items.map((item) => <label key={item.id} className="flex items-center gap-2 rounded-xl border border-hairline-soft px-3 py-2 text-sm"><input type="checkbox" checked={selected.includes(item.id)} onChange={(e) => onChange(e.target.checked ? [...selected, item.id] : selected.filter((id) => id !== item.id))} />{item.label}</label>)}</div></fieldset>; }
 function Submit({ mutation, label, loading, className = "" }: { mutation: { isPending: boolean; isError: boolean }; label: string; loading?: string; className?: string }) { const { t } = useTranslation(); return <div className={className}>{mutation.isError ? <p className="mb-2 text-sm text-critical">{t("common.error")}</p> : null}<button className="w-full rounded-full bg-ink-deep px-4 py-2 text-sm font-bold text-canvas disabled:opacity-60" disabled={mutation.isPending}>{mutation.isPending ? loading ?? t("auth.saving") : label}</button></div>; }
 function Chips({ items }: { items: string[] }) { return items.length ? <div className="mt-5 flex flex-wrap gap-2">{items.map((x) => <span key={x} className="rounded-full bg-surface-soft px-3 py-1 text-xs font-medium text-slate">{x}</span>)}</div> : null; }

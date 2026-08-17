@@ -1,7 +1,7 @@
 import { useState, type InputHTMLAttributes, type ReactNode } from "react";
-import { Link } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import { formatMoney, formatPercent, formatProfitFactor } from "../utils/format";
+import { SetupWizard } from "./SetupWizard";
 
 export function PasswordInput({
   className = "",
@@ -204,14 +204,9 @@ export function ErrorState({ message }: { message: string }) {
 export function NoAccountState() {
   const { t } = useTranslation();
   return (
-    <div className="rounded-xxxl border border-hairline-soft bg-canvas p-10 text-center">
-      <p className="text-base text-ink">{t("common.noAccount")}</p>
-      <Link
-        to="/settings"
-        className="mt-4 inline-block rounded-full bg-ink-deep px-5 py-2.5 text-sm font-bold text-canvas transition-colors hover:bg-charcoal"
-      >
-        {t("common.goToSettings")}
-      </Link>
+    <div className="rounded-xxxl border border-hairline-soft bg-canvas p-6 sm:p-10">
+      <p className="mb-6 text-center text-base text-ink">{t("common.noAccount")}</p>
+      <SetupWizard />
     </div>
   );
 }
@@ -222,6 +217,60 @@ export function EmptyState() {
     <div className="flex items-center justify-center py-12 text-sm text-stone">
       {t("common.empty")}
     </div>
+  );
+}
+
+export function SearchableCheckboxGroup({
+  label,
+  items,
+  selected,
+  onChange,
+}: {
+  label: string;
+  items: { id: number; label: string }[];
+  selected: number[];
+  onChange: (ids: number[]) => void;
+}) {
+  const { t } = useTranslation();
+  const [query, setQuery] = useState("");
+  const filtered = items.filter((item) =>
+    item.label.toLowerCase().includes(query.trim().toLowerCase()),
+  );
+  return (
+    <fieldset className="mt-4">
+      <legend className="mb-2 text-sm font-bold text-ink">{label}</legend>
+      <input
+        className="mt-1 w-full rounded-xl border border-hairline-soft px-3 py-2 text-sm"
+        value={query}
+        onChange={(e) => setQuery(e.target.value)}
+        placeholder={t("common.search")}
+        aria-label={t("common.search")}
+      />
+      <div className="mt-2 grid max-h-56 gap-2 overflow-y-auto pr-1 sm:grid-cols-2">
+        {filtered.map((item) => (
+          <label
+            key={item.id}
+            className="flex items-center gap-2 rounded-xl border border-hairline-soft px-3 py-2 text-sm"
+          >
+            <input
+              type="checkbox"
+              checked={selected.includes(item.id)}
+              onChange={(e) =>
+                onChange(
+                  e.target.checked
+                    ? [...selected, item.id]
+                    : selected.filter((id) => id !== item.id),
+                )
+              }
+            />
+            {item.label}
+          </label>
+        ))}
+        {filtered.length === 0 ? (
+          <p className="text-sm text-slate">{t("common.empty")}</p>
+        ) : null}
+      </div>
+    </fieldset>
   );
 }
 
