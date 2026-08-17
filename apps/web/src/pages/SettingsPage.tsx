@@ -32,6 +32,7 @@ export function SettingsPage() {
   const [instrument, setInstrument] = useState({ code: "", name: "" });
   const [spec, setSpec] = useState({ instrumentFamily: "S50", multiplier: "200", tickSize: "0.1", initialMarginRate: "", maintenanceMarginRate: "", effectiveDate: today() });
   const [term, setTerm] = useState({ brokerId: "", instrumentFamily: "S50", initialMargin: "", maintenanceMargin: "", commission: "0", tradingFee: "0", clearingFee: "0", regulatoryFee: "0", vat: "0", otherFee: "0", effectiveDate: today() });
+  const [now, setNow] = useState(Date.now());
 
   const brokers = useQuery({ queryKey: ["brokers"], queryFn: () => api.get<Broker[]>("/brokers") });
   const instruments = useQuery({ queryKey: ["instruments"], queryFn: () => api.get<Instrument[]>("/instruments") });
@@ -40,6 +41,10 @@ export function SettingsPage() {
   const terms = useQuery({ queryKey: ["broker-terms"], queryFn: () => api.get<BrokerContractTerm[]>("/broker-contract-terms") });
 
   useEffect(() => { if (preferences.data) { setSelectedBrokers(preferences.data.brokers.map((x) => x.id)); setSelectedInstruments(preferences.data.instruments.map((x) => x.id)); } }, [preferences.data]);
+  useEffect(() => {
+    const timer = window.setInterval(() => setNow(Date.now()), 1000);
+    return () => window.clearInterval(timer);
+  }, []);
 
   const savePreferences = useMutation({ mutationFn: () => api.put<UserPreferences>("/me/preferences", { brokerIds: selectedBrokers, instrumentIds: selectedInstruments }), onSuccess: () => void qc.invalidateQueries({ queryKey: ["my-preferences"] }) });
   const accounts = useAccounts();
@@ -92,16 +97,13 @@ export function SettingsPage() {
             <h3 className="mb-2 text-sm font-bold text-ink">{t("account.deletedAccounts")}</h3>
             <div className="space-y-2">
               {(deletedAccounts.data ?? []).map((a) => (
-                <div key={a.id} className="flex items-center justify-between gap-3 rounded-xl border border-hairline-soft bg-surface-soft px-3 py-2">
-                  <span className="text-sm text-stone">
-                    {a.name}
-                    {a.accountNumber ? ` · ${a.accountNumber}` : ""}
-                    <span className="ml-2 text-xs"> · {t("account.restoreIn", { time: a.deletedAt ? formatRemaining(a.deletedAt, Date.now()) : "—" })}</span>
-                  </span>
-                  <button type="button" className="rounded-full bg-ink-deep px-3 py-1 text-xs font-bold text-canvas" disabled={restoreAccount.isPending} onClick={() => restoreAccount.mutate(a.id)}>
-                    {restoreAccount.isPending ? t("account.restoring") : t("account.restore")}
-                  </button>
-                </div>
+                <DeletedAccountRow
+                  key={a.id}
+                  account={a}
+                  now={now}
+                  busy={restoreAccount.isPending}
+                  onRestore={() => restoreAccount.mutate(a.id)}
+                />
               ))}
             </div>
           </div>
@@ -132,6 +134,32 @@ export function SettingsPage() {
       </Card>
     </div></> : null}
   </div>;
+}
+
+function DeletedAccountRow({ account, now, busy, onRestore }: { account: Account; now: number; busy: boolean; onRestore: () => void }) {
+  const { t } = useTranslation();
+  const remaining = account.deletedAt ? formatRemaining(account.deletedAt, now) : "—";
+  return (
+    <div className="flex flex-wrap items-center justify-between gap-3 rounded-xl border border-attention bg-attention-soft px-3 py-3">
+      <div className="min-w-0">
+        <div className="text-sm font-medium text-ink">
+          {account.name}
+          {account.accountNumber ? <span className="text-stone"> · {account.accountNumber}</span> : null}
+        </div>
+        <div className="mt-0.5 text-xs font-medium text-attention">
+          ⏳ {t("account.restoreIn", { time: remaining })}
+        </div>
+      </div>
+      <button
+        type="button"
+        className="rounded-full bg-success px-4 py-1.5 text-xs font-bold text-canvas disabled:opacity-60"
+        disabled={busy}
+        onClick={onRestore}
+      >
+        {busy ? t("account.restoring") : `↩ ${t("account.restore")}`}
+      </button>
+    </div>
+  );
 }
 
 function Card({ tone, emoji, title, subtitle, children }: { tone: keyof typeof tones; emoji: string; title: string; subtitle: string; children: ReactNode }) { return <section className="overflow-hidden rounded-xxxl border border-hairline-soft bg-canvas"><div className={`flex items-center gap-3 border-b border-hairline-soft px-6 py-5 ${tones[tone]}`}><span className="text-xl">{emoji}</span><div><h2 className="text-xl font-medium">{title}</h2><p className="text-sm opacity-70">{subtitle}</p></div></div><div className="p-6">{children}</div></section>; }
