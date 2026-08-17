@@ -11,6 +11,7 @@ export interface AuthUser {
   email: string;
   displayName: string;
   role: "ADMIN" | "USER";
+  isActive: boolean;
 }
 
 export function hashPassword(password: string): string {
@@ -35,7 +36,7 @@ export function userCount(db: Db): number {
   return db.select({ id: schema.users.id }).from(schema.users).all().length;
 }
 
-export function createUser(db: Db, input: { email: string; displayName: string; password: string; role: "ADMIN" | "USER" }) {
+export function createUser(db: Db, input: { email: string; displayName: string; password: string; role: "ADMIN" | "USER"; isActive?: boolean }) {
   const existing = db.select({ id: schema.users.id }).from(schema.users).where(eq(schema.users.email, input.email)).get();
   if (existing) throw errors.conflict("Email is already registered");
   return db.insert(schema.users).values({
@@ -43,7 +44,14 @@ export function createUser(db: Db, input: { email: string; displayName: string; 
     displayName: input.displayName,
     passwordHash: hashPassword(input.password),
     role: input.role,
+    isActive: input.isActive ?? true,
   }).returning().get();
+}
+
+export function setUserActive(db: Db, userId: number, isActive: boolean) {
+  const user = db.update(schema.users).set({ isActive }).where(eq(schema.users.id, userId)).returning().get();
+  if (!user) throw errors.notFound("User");
+  return toUserDto(user);
 }
 
 export function createSession(db: Db, email: string, password: string) {
@@ -108,5 +116,5 @@ export function updateUserPreferences(db: Db, userId: number, brokerIds: number[
 }
 
 export function toUserDto(user: schema.User): AuthUser {
-  return { id: user.id, email: user.email, displayName: user.displayName, role: user.role === "ADMIN" ? "ADMIN" : "USER" };
+  return { id: user.id, email: user.email, displayName: user.displayName, role: user.role === "ADMIN" ? "ADMIN" : "USER", isActive: user.isActive };
 }

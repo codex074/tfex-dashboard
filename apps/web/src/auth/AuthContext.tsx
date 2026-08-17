@@ -6,6 +6,7 @@ interface AuthContextValue {
   loading: boolean;
   needsBootstrap: boolean;
   authenticate: (email: string, password: string, displayName?: string) => Promise<void>;
+  register: (email: string, password: string, confirmPassword: string, displayName: string) => Promise<void>;
   logout: () => Promise<void>;
 }
 
@@ -38,6 +39,10 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     setNeedsBootstrap(false);
   }
 
+  async function register(email: string, password: string, confirmPassword: string, displayName: string) {
+    await api.post("/auth/register", { email, password, confirmPassword, displayName });
+  }
+
   async function logout() {
     try { await api.post("/auth/logout"); } finally {
       window.localStorage.removeItem(AUTH_TOKEN_KEY);
@@ -45,7 +50,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     }
   }
 
-  return <AuthContext.Provider value={{ user, loading, needsBootstrap, authenticate, logout }}>{children}</AuthContext.Provider>;
+  return <AuthContext.Provider value={{ user, loading, needsBootstrap, authenticate, register, logout }}>{children}</AuthContext.Provider>;
 }
 
 export function useAuth() {

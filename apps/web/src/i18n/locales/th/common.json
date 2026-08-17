@@ -28,7 +28,18 @@
     "login": "เข้าสู่ระบบ",
     "logout": "ออกจากระบบ",
     "saving": "กำลังดำเนินการ…",
-    "error": "อีเมลหรือรหัสผ่านไม่ถูกต้อง"
+    "error": "อีเมลหรือรหัสผ่านไม่ถูกต้อง",
+    "registerTitle": "สมัครสมาชิก",
+    "registerHelp": "สมัครสมาชิกแล้วรอให้ Admin เปิดใช้งานบัญชีของคุณ",
+    "confirmPassword": "ยืนยันรหัสผ่าน",
+    "passwordMismatch": "รหัสผ่านไม่ตรงกัน",
+    "register": "สมัครสมาชิก",
+    "registerError": "ไม่สามารถสมัครสมาชิกได้ อีเมลนี้อาจถูกใช้งานแล้ว",
+    "registerSuccess": "สมัครสมาชิกสำเร็จ กรุณารอให้ Admin เปิดใช้งานบัญชีก่อนเข้าสู่ระบบ",
+    "haveAccount": "มีบัญชีอยู่แล้ว?",
+    "noAccount": "ยังไม่มีบัญชี?",
+    "showPassword": "แสดงรหัสผ่าน",
+    "hidePassword": "ซ่อนรหัสผ่าน"
   },
   "transactionForm": {
     "title": "บันทึกธุรกรรม",
@@ -45,7 +56,7 @@
     "saving": "กำลังบันทึก…",
     "error": "ไม่สามารถแก้ไขธุรกรรมได้ กรุณาตรวจสอบข้อมูล"
   },
-  "settings": { "title": "ตั้งค่า", "myDefaults": "ค่าเริ่มต้นของฉัน", "myDefaultsHelp": "เลือก Broker และสินทรัพย์ที่คุณใช้งาน ตัวเลือกที่เลือกจะปรากฏใน Dropdown ตอนบันทึกธุรกรรม", "saveDefaults": "บันทึกค่าเริ่มต้น", "saved": "บันทึกแล้ว", "adminArea": "การตั้งค่าสำหรับ Admin", "members": "สมาชิก", "membersHelp": "สร้างบัญชีผู้ใช้และกำหนดสิทธิ์", "role": "สิทธิ์", "addMember": "เพิ่มสมาชิก", "instruments": "รายการสินทรัพย์", "instrumentsHelp": "จัดการสินทรัพย์ที่ผู้ใช้เลือกได้ เช่น S50 และ GO", "instrumentCode": "รหัสสินทรัพย์", "instrumentName": "ชื่อสินทรัพย์", "addInstrument": "เพิ่มสินทรัพย์", "contractSpecs": "สเปกสัญญา", "contractHelp": "กำหนด multiplier และ tick size ของสินทรัพย์", "brokerTerms": "เงื่อนไข Broker", "brokerHelp": "กำหนดเงินประกันและค่าธรรมเนียมตาม Broker", "instrumentFamily": "สินทรัพย์", "multiplier": "บาทต่อจุด", "tickSize": "Tick size", "effectiveDate": "มีผลตั้งแต่", "broker": "Broker", "selectBroker": "เลือก Broker", "initialMargin": "เงินประกันเริ่มต้น", "maintenanceMargin": "เงินประกันรักษาสถานะ", "commission": "Commission" },
+  "settings": { "title": "ตั้งค่า", "myDefaults": "ค่าเริ่มต้นของฉัน", "myDefaultsHelp": "เลือก Broker และสินทรัพย์ที่คุณใช้งาน ตัวเลือกที่เลือกจะปรากฏใน Dropdown ตอนบันทึกธุรกรรม", "saveDefaults": "บันทึกค่าเริ่มต้น", "saved": "บันทึกแล้ว", "adminArea": "การตั้งค่าสำหรับ Admin", "members": "สมาชิก", "membersHelp": "สร้างบัญชีผู้ใช้และกำหนดสิทธิ์", "role": "สิทธิ์", "addMember": "เพิ่มสมาชิก", "instruments": "รายการสินทรัพย์", "instrumentsHelp": "จัดการสินทรัพย์ที่ผู้ใช้เลือกได้ เช่น S50 และ GO", "instrumentCode": "รหัสสินทรัพย์", "instrumentName": "ชื่อสินทรัพย์", "addInstrument": "เพิ่มสินทรัพย์", "contractSpecs": "สเปกสัญญา", "contractHelp": "กำหนด multiplier, tick size และอัตราเงินประกันของสินทรัพย์", "brokerTerms": "เงื่อนไข Broker", "brokerHelp": "กำหนดเงินประกันและค่าธรรมเนียมตาม Broker", "instrumentFamily": "สินทรัพย์", "multiplier": "บาทต่อจุด", "tickSize": "Tick size", "initialMarginRate": "อัตราเงินประกันเริ่มต้น (%)", "maintenanceMarginRate": "อัตราเงินประกันรักษาสถานะ (%)", "effectiveDate": "มีผลตั้งแต่", "broker": "Broker", "selectBroker": "เลือก Broker", "initialMargin": "เงินประกันเริ่มต้น", "maintenanceMargin": "เงินประกันรักษาสถานะ", "commission": "Commission", "pending": "รออนุมัติ", "activate": "เปิดใช้งาน" },
   "account": {
     "title": "บัญชีเทรด",
     "help": "สร้างบัญชีเทรดของคุณเพื่อเริ่มบันทึกการเทรด",

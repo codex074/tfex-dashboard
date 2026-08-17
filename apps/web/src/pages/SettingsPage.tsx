@@ -3,7 +3,7 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useTranslation } from "react-i18next";
 import { useAuth } from "../auth/AuthContext";
 import { api, type AuthUser, type Broker, type BrokerContractTerm, type Instrument, type InstrumentContractSpec, type UserPreferences } from "../services/api";
-import { PageTitle } from "../components/ui";
+import { PageTitle, PasswordInput } from "../components/ui";
 
 const input = "mt-1 w-full rounded-xl border border-hairline-soft px-3 py-2 text-sm";
 const today = () => new Date().toISOString().slice(0, 10);
@@ -20,7 +20,7 @@ export function SettingsPage() {
   const [broker, setBroker] = useState({ name: "", shortName: "" });
   const [instrument, setInstrument] = useState({ code: "", name: "" });
   const [member, setMember] = useState({ displayName: "", email: "", password: "", role: "USER" });
-  const [spec, setSpec] = useState({ instrumentFamily: "S50", multiplier: "200", tickSize: "0.1", effectiveDate: today() });
+  const [spec, setSpec] = useState({ instrumentFamily: "S50", multiplier: "200", tickSize: "0.1", initialMarginRate: "", maintenanceMarginRate: "", effectiveDate: today() });
   const [term, setTerm] = useState({ brokerId: "", instrumentFamily: "S50", initialMargin: "", maintenanceMargin: "", commission: "0", tradingFee: "0", clearingFee: "0", regulatoryFee: "0", vat: "0", otherFee: "0", effectiveDate: today() });
 
   const brokers = useQuery({ queryKey: ["brokers"], queryFn: () => api.get<Broker[]>("/brokers") });
@@ -37,7 +37,8 @@ export function SettingsPage() {
   const createBroker = useMutation({ mutationFn: () => api.post("/brokers", broker), onSuccess: () => { void qc.invalidateQueries({ queryKey: ["brokers"] }); setBroker({ name: "", shortName: "" }); } });
   const createInstrument = useMutation({ mutationFn: () => api.post("/instruments", instrument), onSuccess: () => { void qc.invalidateQueries({ queryKey: ["instruments"] }); setInstrument({ code: "", name: "" }); } });
   const createMember = useMutation({ mutationFn: () => api.post("/admin/users", member), onSuccess: () => { void qc.invalidateQueries({ queryKey: ["members"] }); setMember({ displayName: "", email: "", password: "", role: "USER" }); } });
-  const saveSpec = useMutation({ mutationFn: () => api.post("/instrument-contract-specs", spec), onSuccess: () => void qc.invalidateQueries({ queryKey: ["contract-specs"] }) });
+  const activateMember = useMutation({ mutationFn: (id: number) => api.patch(`/admin/users/${id}`, { isActive: true }), onSuccess: () => void qc.invalidateQueries({ queryKey: ["members"] }) });
+  const saveSpec = useMutation({ mutationFn: () => api.post("/instrument-contract-specs", { ...spec, initialMarginRate: spec.initialMarginRate || null, maintenanceMarginRate: spec.maintenanceMarginRate || null }), onSuccess: () => void qc.invalidateQueries({ queryKey: ["contract-specs"] }) });
   const saveTerm = useMutation({ mutationFn: () => api.post("/broker-contract-terms", { ...term, brokerId: Number(term.brokerId) }), onSuccess: () => void qc.invalidateQueries({ queryKey: ["broker-terms"] }) });
 
   return <div className="space-y-10">
@@ -64,10 +65,11 @@ export function SettingsPage() {
         <form className="grid gap-4 md:grid-cols-2" onSubmit={(e) => { e.preventDefault(); createMember.mutate(); }}>
           <Label text={t("auth.displayName")}><input className={input} value={member.displayName} onChange={(e) => setMember({ ...member, displayName: e.target.value })} required /></Label>
           <Label text={t("auth.email")}><input className={input} type="email" value={member.email} onChange={(e) => setMember({ ...member, email: e.target.value })} required /></Label>
-          <Label text={t("auth.password")}><input className={input} type="password" minLength={8} value={member.password} onChange={(e) => setMember({ ...member, password: e.target.value })} required /></Label>
+          <Label text={t("auth.password")}><PasswordInput className={input} minLength={8} value={member.password} onChange={(e) => setMember({ ...member, password: e.target.value })} required /></Label>
           <Label text={t("settings.role")}><select className={input} value={member.role} onChange={(e) => setMember({ ...member, role: e.target.value })}><option value="USER">USER</option><option value="ADMIN">ADMIN</option></select></Label>
           <Submit mutation={createMember} className="md:col-span-2" label={t("settings.addMember")} />
-        </form><Chips items={(members.data ?? []).map((x) => `${x.displayName} · ${x.role}`)} />
+        </form>
+        <MemberList members={members.data ?? []} onActivate={(id) => activateMember.mutate(id)} activating={activateMember.isPending ? activateMember.variables : undefined} />
       </Card>
       <Card tone="brokers" emoji="🏦" title={t("brokers.title")} subtitle={t("brokers.help")}>
         <form className="grid gap-4 md:grid-cols-2" onSubmit={(e) => { e.preventDefault(); createBroker.mutate(); }}><Label text={t("brokers.name")}><input className={input} value={broker.name} onChange={(e) => setBroker({ ...broker, name: e.target.value })} required /></Label><Label text={t("brokers.shortName")}><input className={input} value={broker.shortName} onChange={(e) => setBroker({ ...broker, shortName: e.target.value })} required /></Label><Submit mutation={createBroker} className="md:col-span-2" label={t("brokers.add")} /></form><Chips items={(brokers.data ?? []).map((x) => `${x.name} (${x.shortName})`)} />
@@ -76,7 +78,7 @@ export function SettingsPage() {
         <form className="grid gap-4 md:grid-cols-2" onSubmit={(e) => { e.preventDefault(); createInstrument.mutate(); }}><Label text={t("settings.instrumentCode")}><input className={input} value={instrument.code} onChange={(e) => setInstrument({ ...instrument, code: e.target.value.toUpperCase() })} placeholder="S50" required /></Label><Label text={t("settings.instrumentName")}><input className={input} value={instrument.name} onChange={(e) => setInstrument({ ...instrument, name: e.target.value })} required /></Label><Submit mutation={createInstrument} className="md:col-span-2" label={t("settings.addInstrument")} /></form><Chips items={(instruments.data ?? []).map((x) => `${x.code} · ${x.name}`)} />
       </Card>
       <Card tone="specs" emoji="📐" title={t("settings.contractSpecs")} subtitle={t("settings.contractHelp")}>
-        <form className="grid gap-4 md:grid-cols-2" onSubmit={(e) => { e.preventDefault(); saveSpec.mutate(); }}><Label text={t("settings.instrumentFamily")}><input className={input} value={spec.instrumentFamily} onChange={(e) => setSpec({ ...spec, instrumentFamily: e.target.value.toUpperCase() })} required /></Label><Label text={t("settings.multiplier")}><input className={input} type="number" min="0.01" step="0.01" value={spec.multiplier} onChange={(e) => setSpec({ ...spec, multiplier: e.target.value })} required /></Label><Label text={t("settings.tickSize")}><input className={input} type="number" min="0.01" step="0.01" value={spec.tickSize} onChange={(e) => setSpec({ ...spec, tickSize: e.target.value })} required /></Label><Label text={t("settings.effectiveDate")}><input className={input} type="date" value={spec.effectiveDate} onChange={(e) => setSpec({ ...spec, effectiveDate: e.target.value })} required /></Label><Submit mutation={saveSpec} className="md:col-span-2" label={t("common.save")} /></form><Chips items={(specs.data ?? []).map((x) => `${x.instrumentFamily} · ${x.multiplier} THB/point`)} />
+        <form className="grid gap-4 md:grid-cols-2" onSubmit={(e) => { e.preventDefault(); saveSpec.mutate(); }}><Label text={t("settings.instrumentFamily")}><input className={input} value={spec.instrumentFamily} onChange={(e) => setSpec({ ...spec, instrumentFamily: e.target.value.toUpperCase() })} required /></Label><Label text={t("settings.multiplier")}><input className={input} type="number" min="0.01" step="0.01" value={spec.multiplier} onChange={(e) => setSpec({ ...spec, multiplier: e.target.value })} required /></Label><Label text={t("settings.tickSize")}><input className={input} type="number" min="0.01" step="0.01" value={spec.tickSize} onChange={(e) => setSpec({ ...spec, tickSize: e.target.value })} required /></Label><Label text={t("settings.initialMarginRate")}><input className={input} type="number" min="0" step="0.01" placeholder="%" value={spec.initialMarginRate} onChange={(e) => setSpec({ ...spec, initialMarginRate: e.target.value })} /></Label><Label text={t("settings.maintenanceMarginRate")}><input className={input} type="number" min="0" step="0.01" placeholder="%" value={spec.maintenanceMarginRate} onChange={(e) => setSpec({ ...spec, maintenanceMarginRate: e.target.value })} /></Label><Label text={t("settings.effectiveDate")}><input className={input} type="date" value={spec.effectiveDate} onChange={(e) => setSpec({ ...spec, effectiveDate: e.target.value })} required /></Label><Submit mutation={saveSpec} className="md:col-span-2" label={t("common.save")} /></form><Chips items={(specs.data ?? []).map((x) => `${x.instrumentFamily} · ${x.multiplier} THB/point${x.initialMarginRate ? ` · ${x.initialMarginRate}% IM` : ""}`)} />
       </Card>
       <Card tone="terms" emoji="🧾" title={t("settings.brokerTerms")} subtitle={t("settings.brokerHelp")}>
         <form className="grid gap-4 md:grid-cols-2" onSubmit={(e) => { e.preventDefault(); saveTerm.mutate(); }}>
@@ -98,3 +100,11 @@ function Label({ text, children }: { text: string; children: ReactNode }) { retu
 function ChoiceGroup({ label, items, selected, onChange }: { label: string; items: { id: number; label: string }[]; selected: number[]; onChange: (ids: number[]) => void }) { return <fieldset className="mt-4"><legend className="mb-2 text-sm font-bold text-ink">{label}</legend><div className="grid gap-2 sm:grid-cols-2">{items.map((item) => <label key={item.id} className="flex items-center gap-2 rounded-xl border border-hairline-soft px-3 py-2 text-sm"><input type="checkbox" checked={selected.includes(item.id)} onChange={(e) => onChange(e.target.checked ? [...selected, item.id] : selected.filter((id) => id !== item.id))} />{item.label}</label>)}</div></fieldset>; }
 function Submit({ mutation, label, loading, className = "" }: { mutation: { isPending: boolean; isError: boolean }; label: string; loading?: string; className?: string }) { const { t } = useTranslation(); return <div className={className}>{mutation.isError ? <p className="mb-2 text-sm text-critical">{t("common.error")}</p> : null}<button className="w-full rounded-full bg-ink-deep px-4 py-2 text-sm font-bold text-canvas disabled:opacity-60" disabled={mutation.isPending}>{mutation.isPending ? loading ?? t("auth.saving") : label}</button></div>; }
 function Chips({ items }: { items: string[] }) { return items.length ? <div className="mt-5 flex flex-wrap gap-2">{items.map((x) => <span key={x} className="rounded-full bg-surface-soft px-3 py-1 text-xs font-medium text-slate">{x}</span>)}</div> : null; }
+function MemberList({ members, onActivate, activating }: { members: AuthUser[]; onActivate: (id: number) => void; activating?: number }) {
+  const { t } = useTranslation();
+  if (!members.length) return null;
+  return <ul className="mt-5 space-y-2">{members.map((x) => <li key={x.id} className="flex items-center justify-between gap-3 rounded-xl bg-surface-soft px-3 py-2 text-sm">
+    <span className="text-slate">{x.displayName} · {x.role}{x.isActive ? "" : ` · ${t("settings.pending")}`}</span>
+    {x.isActive ? null : <button type="button" className="shrink-0 rounded-full bg-ink-deep px-3 py-1 text-xs font-bold text-canvas disabled:opacity-60" disabled={activating === x.id} onClick={() => onActivate(x.id)}>{activating === x.id ? t("auth.saving") : t("settings.activate")}</button>}
+  </li>)}</ul>;
+}

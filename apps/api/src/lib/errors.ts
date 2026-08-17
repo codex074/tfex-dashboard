@@ -18,7 +18,8 @@ export type ApiErrorCode =
   | "UNSUPPORTED_FILE_TYPE"
   | "FILE_TOO_LARGE"
   | "UNAUTHORIZED"
-  | "FORBIDDEN";
+  | "FORBIDDEN"
+  | "RATE_LIMITED";
 
 export class ApiError extends Error {
   readonly statusCode: number;
@@ -68,6 +69,8 @@ export const errors = {
     new ApiError(401, "UNAUTHORIZED", message),
   forbidden: (message = "Insufficient permissions") =>
     new ApiError(403, "FORBIDDEN", message),
+  rateLimited: (message = "Too many requests, please try again later") =>
+    new ApiError(429, "RATE_LIMITED", message),
   internal: (message = "Internal server error") =>
     new ApiError(500, "INTERNAL_ERROR", message),
 };

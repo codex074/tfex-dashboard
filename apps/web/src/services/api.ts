@@ -95,9 +95,9 @@ export interface Account {
 
 export interface Broker { id: number; name: string; shortName: string }
 export interface Instrument { id: number; code: string; name: string; isActive: boolean }
-export interface AuthUser { id: number; email: string; displayName: string; role: "ADMIN" | "USER" }
+export interface AuthUser { id: number; email: string; displayName: string; role: "ADMIN" | "USER"; isActive: boolean }
 export interface UserPreferences { brokers: Broker[]; instruments: Instrument[] }
-export interface InstrumentContractSpec { id: number; instrumentFamily: string; multiplier: string; tickSize: string; effectiveDate: string; isActive: boolean }
+export interface InstrumentContractSpec { id: number; instrumentFamily: string; multiplier: string; tickSize: string; initialMarginRate: string | null; maintenanceMarginRate: string | null; effectiveDate: string; isActive: boolean }
 export interface BrokerContractTerm { id: number; brokerId: number; instrumentFamily: string; initialMargin: string; maintenanceMargin: string; commission: string; tradingFee: string; clearingFee: string; regulatoryFee: string; vat: string; otherFee: string; effectiveDate: string; isActive: boolean }
 
 export interface AccountSummary {

@@ -1,8 +1,9 @@
 import type { FastifyInstance, FastifyRequest } from "fastify";
-import { createUserSchema, loginSchema, updateUserPreferencesSchema } from "@tfex/shared";
+import { createUserSchema, loginSchema, registerUserSchema, setUserActiveSchema, updateUserPreferencesSchema } from "@tfex/shared";
 import type { Db } from "../db/client.js";
 import { errors } from "../lib/errors.js";
-import { createSession, createUser, deleteSession, getUserPreferences, listUsers, toUserDto, updateUserPreferences, userCount, type AuthUser } from "../services/auth.service.js";
+import { rateLimit } from "../lib/rateLimit.js";
+import { createSession, createUser, deleteSession, getUserPreferences, listUsers, setUserActive, toUserDto, updateUserPreferences, userCount, type AuthUser } from "../services/auth.service.js";
 
 declare module "fastify" {
   interface FastifyRequest { authUser?: AuthUser; authToken?: string }
@@ -34,6 +35,13 @@ export function registerAuthRoutes(app: FastifyInstance, db: Db) {
     return { data: createSession(db, input.email, input.password) };
   });
 
+  app.post("/api/auth/register", async (request) => {
+    rateLimit(`register:${request.ip}`, 5, 15 * 60 * 1000);
+    const input = registerUserSchema.parse(request.body);
+    const user = createUser(db, { email: input.email, displayName: input.displayName, password: input.password, role: "USER", isActive: false });
+    return { data: toUserDto(user) };
+  });
+
   app.get("/api/auth/me", async (request) => ({ data: requireUser(request) }));
   app.post("/api/auth/logout", async (request) => {
     requireUser(request);
@@ -48,6 +56,11 @@ export function registerAuthRoutes(app: FastifyInstance, db: Db) {
   app.post("/api/admin/users", async (request) => {
     requireAdmin(request);
     return { data: toUserDto(createUser(db, createUserSchema.parse(request.body))) };
+  });
+  app.patch<{ Params: { id: string } }>("/api/admin/users/:id", async (request) => {
+    requireAdmin(request);
+    const input = setUserActiveSchema.parse(request.body);
+    return { data: setUserActive(db, Number(request.params.id), input.isActive) };
   });
 
   app.get("/api/me/preferences", async (request) => ({ data: getUserPreferences(db, requireUser(request).id) }));

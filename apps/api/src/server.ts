@@ -33,10 +33,10 @@ export function buildApp(options: { disableAuth?: boolean } = {}): FastifyInstan
 
   app.addHook("onRequest", async (request) => {
     if (options.disableAuth) {
-      request.authUser = { id: 0, email: "test@example.com", displayName: "Test Admin", role: "ADMIN" };
+      request.authUser = { id: 0, email: "test@example.com", displayName: "Test Admin", role: "ADMIN", isActive: true };
       return;
     }
-    if (request.method === "OPTIONS" || request.url === "/api/health" || request.url === "/api/auth/status" || request.url === "/api/auth/login" || request.url === "/api/auth/bootstrap") return;
+    if (request.method === "OPTIONS" || request.url === "/api/health" || request.url === "/api/auth/status" || request.url === "/api/auth/login" || request.url === "/api/auth/bootstrap" || request.url === "/api/auth/register") return;
     const authorization = request.headers.authorization;
     const token = authorization?.startsWith("Bearer ") ? authorization.slice(7) : undefined;
     if (!token) throw errors.unauthorized();

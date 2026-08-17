@@ -28,7 +28,18 @@
     "login": "Sign in",
     "logout": "Sign out",
     "saving": "Please wait…",
-    "error": "Invalid email or password."
+    "error": "Invalid email or password.",
+    "registerTitle": "Create account",
+    "registerHelp": "Sign up, then wait for an admin to activate your account.",
+    "confirmPassword": "Confirm password",
+    "passwordMismatch": "Passwords do not match.",
+    "register": "Sign up",
+    "registerError": "Could not create your account. The email may already be registered.",
+    "registerSuccess": "Account created. An admin needs to activate it before you can sign in.",
+    "haveAccount": "Already have an account?",
+    "noAccount": "Don't have an account?",
+    "showPassword": "Show password",
+    "hidePassword": "Hide password"
   },
   "transactionForm": {
     "title": "Record transaction",
@@ -45,7 +56,7 @@
     "saving": "Saving…",
     "error": "Unable to update the transaction. Please check the details."
   },
-  "settings": { "title": "Settings", "myDefaults": "My defaults", "myDefaultsHelp": "Select the brokers and instruments you use. Your choices populate transaction dropdowns.", "saveDefaults": "Save defaults", "saved": "Saved", "adminArea": "Admin settings", "members": "Members", "membersHelp": "Create member accounts and assign roles.", "role": "Role", "addMember": "Add member", "instruments": "Instruments", "instrumentsHelp": "Manage instruments users can select, such as S50 and GO.", "instrumentCode": "Instrument code", "instrumentName": "Instrument name", "addInstrument": "Add instrument", "contractSpecs": "Contract specs", "contractHelp": "Set the multiplier and tick size for each instrument.", "brokerTerms": "Broker terms", "brokerHelp": "Set margin and fee defaults per broker.", "instrumentFamily": "Instrument", "multiplier": "THB per point", "tickSize": "Tick size", "effectiveDate": "Effective from", "broker": "Broker", "selectBroker": "Select broker", "initialMargin": "Initial margin", "maintenanceMargin": "Maintenance margin", "commission": "Commission" },
+  "settings": { "title": "Settings", "myDefaults": "My defaults", "myDefaultsHelp": "Select the brokers and instruments you use. Your choices populate transaction dropdowns.", "saveDefaults": "Save defaults", "saved": "Saved", "adminArea": "Admin settings", "members": "Members", "membersHelp": "Create member accounts and assign roles.", "role": "Role", "addMember": "Add member", "instruments": "Instruments", "instrumentsHelp": "Manage instruments users can select, such as S50 and GO.", "instrumentCode": "Instrument code", "instrumentName": "Instrument name", "addInstrument": "Add instrument", "contractSpecs": "Contract specs", "contractHelp": "Set the multiplier, tick size, and margin rates for each instrument.", "brokerTerms": "Broker terms", "brokerHelp": "Set margin and fee defaults per broker.", "instrumentFamily": "Instrument", "multiplier": "THB per point", "tickSize": "Tick size", "initialMarginRate": "Initial margin rate (%)", "maintenanceMarginRate": "Maintenance margin rate (%)", "effectiveDate": "Effective from", "broker": "Broker", "selectBroker": "Select broker", "initialMargin": "Initial margin", "maintenanceMargin": "Maintenance margin", "commission": "Commission", "pending": "Pending activation", "activate": "Activate" },
   "account": {
     "title": "Trading account",
     "help": "Create your trading account to start recording trades.",

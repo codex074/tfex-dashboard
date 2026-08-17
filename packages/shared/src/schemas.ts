@@ -41,6 +41,20 @@ export const createUserSchema = loginSchema.extend({
   role: z.enum(["ADMIN", "USER"]).default("USER"),
 });
 
+export const registerUserSchema = loginSchema
+  .extend({
+    displayName: z.string().trim().min(1).max(100),
+    confirmPassword: z.string().min(8).max(128),
+  })
+  .refine((value) => value.password === value.confirmPassword, {
+    message: "Passwords do not match",
+    path: ["confirmPassword"],
+  });
+
+export const setUserActiveSchema = z.object({
+  isActive: z.boolean(),
+});
+
 export const createInstrumentSchema = z.object({
   code: z.string().trim().min(1).max(20).transform((value) => value.toUpperCase()),
   name: z.string().trim().min(1).max(100),
@@ -67,10 +81,19 @@ export const createBrokerSchema = z.object({
   shortName: z.string().min(1),
 });
 
+const bpsString = z
+  .string()
+  .regex(/^\d+(\.\d{1,4})?$/, "Margin rate must be a non-negative percentage")
+  .optional()
+  .nullable();
+
 export const createInstrumentContractSpecSchema = z.object({
   instrumentFamily: z.string().min(1).regex(/^[A-Z0-9]+$/),
   multiplier: nonNegativeMoneyString.refine((value) => value !== "0"),
   tickSize: priceString,
+  // Margin rates are percentages of contract value (e.g. "8.5" = 8.5%).
+  initialMarginRate: bpsString,
+  maintenanceMarginRate: bpsString,
   effectiveDate: z.string().regex(/^\d{4}-\d{2}-\d{2}$/),
 });
 
