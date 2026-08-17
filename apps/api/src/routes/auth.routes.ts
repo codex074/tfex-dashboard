@@ -1,9 +1,9 @@
 import type { FastifyInstance, FastifyRequest } from "fastify";
-import { createUserSchema, loginSchema, registerUserSchema, setUserActiveSchema, updateUserPreferencesSchema } from "@tfex/shared";
+import { createUserSchema, loginSchema, registerUserSchema, updateUserPreferencesSchema, updateUserSchema } from "@tfex/shared";
 import type { Db } from "../db/client.js";
 import { errors } from "../lib/errors.js";
 import { rateLimit } from "../lib/rateLimit.js";
-import { createSession, createUser, deleteSession, getUserPreferences, listUsers, setUserActive, toUserDto, updateUserPreferences, userCount, type AuthUser } from "../services/auth.service.js";
+import { createSession, createUser, deleteSession, getUserPreferences, listUsers, toUserDto, updateUser, updateUserPreferences, userCount, type AuthUser } from "../services/auth.service.js";
 
 declare module "fastify" {
   interface FastifyRequest { authUser?: AuthUser; authToken?: string }
@@ -59,8 +59,8 @@ export function registerAuthRoutes(app: FastifyInstance, db: Db) {
   });
   app.patch<{ Params: { id: string } }>("/api/admin/users/:id", async (request) => {
     requireAdmin(request);
-    const input = setUserActiveSchema.parse(request.body);
-    return { data: setUserActive(db, Number(request.params.id), input.isActive) };
+    const input = updateUserSchema.parse(request.body);
+    return { data: updateUser(db, Number(request.params.id), input) };
   });
 
   app.get("/api/me/preferences", async (request) => ({ data: getUserPreferences(db, requireUser(request).id) }));

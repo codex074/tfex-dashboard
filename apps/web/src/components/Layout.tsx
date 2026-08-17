@@ -5,15 +5,24 @@ import { persistLanguage } from "../i18n";
 import { LanguageSwitcher } from "./LanguageSwitcher";
 import { useAuth } from "../auth/AuthContext";
 
-const navItems = [
+interface NavItem {
+  key: string;
+  path: string;
+  i18nKey: string;
+  icon: string;
+  adminOnly?: boolean;
+}
+
+const navItems: NavItem[] = [
   { key: "dashboard", path: "/", i18nKey: "nav.dashboard", icon: "📊" },
   { key: "portfolio", path: "/portfolio", i18nKey: "nav.portfolio", icon: "💼" },
   { key: "transactions", path: "/transactions", i18nKey: "nav.transactions", icon: "🧾" },
   { key: "sessions", path: "/sessions", i18nKey: "nav.sessions", icon: "📈" },
   { key: "cashflow", path: "/cash-flow", i18nKey: "nav.cashFlow", icon: "💸" },
   { key: "analytics", path: "/analytics", i18nKey: "nav.analytics", icon: "🔍" },
+  { key: "users", path: "/admin/users", i18nKey: "nav.users", icon: "👥", adminOnly: true },
   { key: "settings", path: "/settings", i18nKey: "nav.settings", icon: "⚙️" },
-] as const;
+];
 
 export function Layout() {
   const { t, i18n } = useTranslation();
@@ -53,7 +62,7 @@ export function Layout() {
         </div>
 
         <nav className="mt-2 flex-1 space-y-1 overflow-y-auto px-3">
-          {navItems.map((item) => (
+          {navItems.filter((item) => !item.adminOnly || user?.role === "ADMIN").map((item) => (
             <NavLink
               key={item.key}
               to={item.path}

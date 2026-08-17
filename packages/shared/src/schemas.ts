@@ -55,6 +55,16 @@ export const setUserActiveSchema = z.object({
   isActive: z.boolean(),
 });
 
+export const updateUserSchema = z
+  .object({
+    displayName: z.string().trim().min(1).max(100).optional(),
+    role: z.enum(["ADMIN", "USER"]).optional(),
+    isActive: z.boolean().optional(),
+  })
+  .refine((value) => Object.values(value).some((v) => v !== undefined), {
+    message: "Nothing to update",
+  });
+
 export const createInstrumentSchema = z.object({
   code: z.string().trim().min(1).max(20).transform((value) => value.toUpperCase()),
   name: z.string().trim().min(1).max(100),

@@ -10,7 +10,29 @@
     "cashFlow": "Cash Flow",
     "analytics": "Analytics",
     "statements": "Statements",
-    "settings": "Settings"
+    "settings": "Settings",
+    "users": "Users"
+  },
+  "users": {
+    "title": "User management",
+    "subtitle": "Create member accounts, assign roles, and activate or deactivate access.",
+    "createTitle": "Add a user",
+    "createHelp": "Create a new account. The member can sign in immediately unless you deactivate their account.",
+    "role": "Role",
+    "roleUser": "User",
+    "roleAdmin": "Admin",
+    "add": "Add user",
+    "active": "Active",
+    "inactive": "Inactive",
+    "activate": "Activate",
+    "deactivate": "Deactivate",
+    "you": "you",
+    "createError": "Could not create this user. The email may already be registered.",
+    "updateError": "Could not update this user. You cannot deactivate or demote the last active administrator.",
+    "columns": {
+      "name": "Name",
+      "actions": "Actions"
+    }
   },
   "language": {
     "thai": "ไทย",

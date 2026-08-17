@@ -7,6 +7,7 @@ import { CashFlowPage } from "./pages/CashFlowPage";
 import { AnalyticsPage } from "./pages/AnalyticsPage";
 import { SettingsPage } from "./pages/SettingsPage";
 import { TradesPage } from "./pages/TradesPage";
+import { AdminUsersPage } from "./pages/AdminUsersPage";
 import { useAuth } from "./auth/AuthContext";
 import { LoginPage } from "./pages/LoginPage";
 import { Loading } from "./components/ui";
@@ -25,6 +26,9 @@ export default function App() {
         <Route path="transactions" element={<TransactionsPage />} />
         <Route path="cash-flow" element={<CashFlowPage />} />
         <Route path="analytics" element={<AnalyticsPage />} />
+        {user.role === "ADMIN" ? (
+          <Route path="admin/users" element={<AdminUsersPage />} />
+        ) : null}
         <Route path="settings" element={<SettingsPage />} />
       </Route>
     </Routes>

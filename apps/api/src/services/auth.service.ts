@@ -54,6 +54,52 @@ export function setUserActive(db: Db, userId: number, isActive: boolean) {
   return toUserDto(user);
 }
 
+/**
+ * Update mutable user fields (admin-only). Refuses to demote/deactivate the
+ * last active administrator so an admin cannot accidentally lock every
+ * administrator out of the system (including themselves).
+ */
+export function updateUser(
+  db: Db,
+  userId: number,
+  input: { displayName?: string; role?: "ADMIN" | "USER"; isActive?: boolean },
+) {
+  const target = db.select().from(schema.users).where(eq(schema.users.id, userId)).get();
+  if (!target) throw errors.notFound("User");
+
+  const nextRole = input.role ?? (target.role === "ADMIN" ? "ADMIN" : "USER");
+  const nextActive = input.isActive ?? target.isActive;
+
+  const removingActiveAdmin =
+    target.role === "ADMIN" &&
+    target.isActive &&
+    (nextRole !== "ADMIN" || !nextActive);
+
+  if (removingActiveAdmin) {
+    const activeAdmins = db
+      .select({ id: schema.users.id })
+      .from(schema.users)
+      .where(and(eq(schema.users.role, "ADMIN"), eq(schema.users.isActive, true)))
+      .all().length;
+    if (activeAdmins <= 1) {
+      throw errors.validation("Cannot deactivate or demote the last active administrator");
+    }
+  }
+
+  const updated = db
+    .update(schema.users)
+    .set({
+      ...(input.displayName !== undefined ? { displayName: input.displayName } : {}),
+      ...(input.role !== undefined ? { role: input.role } : {}),
+      ...(input.isActive !== undefined ? { isActive: input.isActive } : {}),
+    })
+    .where(eq(schema.users.id, userId))
+    .returning()
+    .get();
+  if (!updated) throw errors.notFound("User");
+  return toUserDto(updated);
+}
+
 export function createSession(db: Db, email: string, password: string) {
   const user = db.select().from(schema.users).where(eq(schema.users.email, email)).get();
   if (!user || !user.isActive || !verifyPassword(password, user.passwordHash)) {
