@@ -1,4 +1,4 @@
-import { and, desc, eq } from "drizzle-orm";
+import { and, desc, eq, gte, isNotNull, isNull, lt } from "drizzle-orm";
 import { TRADE_STATUS } from "@tfex/shared";
 import type { Db } from "../db/client.js";
 import * as schema from "../db/schema.js";
@@ -7,6 +7,9 @@ import { parseMoneyOrZero } from "../lib/parse.js";
 import { money } from "../lib/serialize.js";
 import { errors } from "../lib/errors.js";
 import { positionTotals } from "./position.service.js";
+
+/** Deleted accounts remain recoverable (undo) for this long. */
+export const ACCOUNT_DELETE_GRACE_MS = 24 * 60 * 60 * 1000;
 
 export interface CreateAccountInput {
   userId?: number;
@@ -35,21 +38,118 @@ export function createAccount(db: Db, input: CreateAccountInput) {
   return row;
 }
 
+/**
+ * Lists only live (non-deleted) accounts. Soft-deleted accounts are surfaced
+ * separately through `listDeletedAccounts` so they can be restored within the
+ * grace window.
+ */
 export function listAccounts(db: Db, userId?: number) {
-  const query = db.select().from(schema.accounts);
-  return (userId === undefined ? query : query.where(eq(schema.accounts.userId, userId))).orderBy(desc(schema.accounts.createdAt)).all();
+  const conditions = [isNull(schema.accounts.deletedAt)];
+  if (userId !== undefined) {
+    conditions.push(eq(schema.accounts.userId, userId));
+  }
+  return db
+    .select()
+    .from(schema.accounts)
+    .where(and(...conditions))
+    .orderBy(desc(schema.accounts.createdAt))
+    .all();
+}
+
+/** Soft-deleted accounts that are still within the 24h undo window. */
+export function listDeletedAccounts(db: Db, userId?: number) {
+  purgeExpiredDeletedAccounts(db);
+  const cutoff = graceCutoffIso();
+  const conditions = [
+    isNotNull(schema.accounts.deletedAt),
+    gte(schema.accounts.deletedAt, cutoff),
+  ];
+  if (userId !== undefined) {
+    conditions.push(eq(schema.accounts.userId, userId));
+  }
+  return db
+    .select()
+    .from(schema.accounts)
+    .where(and(...conditions))
+    .orderBy(desc(schema.accounts.deletedAt))
+    .all();
 }
 
 export function getAccount(db: Db, id: number) {
   const account = db
     .select()
     .from(schema.accounts)
-    .where(eq(schema.accounts.id, id))
+    .where(and(eq(schema.accounts.id, id), isNull(schema.accounts.deletedAt)))
     .get();
   if (!account) {
     throw errors.notFound("Account");
   }
   return account;
+}
+
+/**
+ * Marks an account as deleted without destroying its data. The row is only
+ * physically removed once the grace window elapses (see purge).
+ */
+export function deleteAccount(db: Db, id: number) {
+  const account = getAccount(db, id);
+  return db
+    .update(schema.accounts)
+    .set({ deletedAt: new Date().toISOString() })
+    .where(eq(schema.accounts.id, account.id))
+    .returning()
+    .get();
+}
+
+/**
+ * Restores a soft-deleted account as long as it is still within the undo
+ * window.
+ */
+export function restoreAccount(db: Db, id: number) {
+  const account = db
+    .select()
+    .from(schema.accounts)
+    .where(eq(schema.accounts.id, id))
+    .get();
+  if (!account || !account.deletedAt) {
+    throw errors.notFound("Deleted account");
+  }
+  if (Date.now() - Date.parse(account.deletedAt) > ACCOUNT_DELETE_GRACE_MS) {
+    throw errors.conflict("Account delete grace period has expired");
+  }
+  return db
+    .update(schema.accounts)
+    .set({ deletedAt: null })
+    .where(eq(schema.accounts.id, id))
+    .returning()
+    .get();
+}
+
+function graceCutoffIso(): string {
+  return new Date(Date.now() - ACCOUNT_DELETE_GRACE_MS).toISOString();
+}
+
+/**
+ * Physically deletes accounts whose grace window has elapsed. Cascade
+ * foreign keys remove the associated transactions, trades, positions,
+ * snapshots and journals.
+ */
+export function purgeExpiredDeletedAccounts(db: Db) {
+  const cutoff = graceCutoffIso();
+  const expired = db
+    .select({ id: schema.accounts.id })
+    .from(schema.accounts)
+    .where(
+      and(
+        isNotNull(schema.accounts.deletedAt),
+        lt(schema.accounts.deletedAt, cutoff),
+      ),
+    )
+    .all();
+  for (const { id } of expired) {
+    db.delete(schema.accounts).where(eq(schema.accounts.id, id)).run();
+  }
+  return expired.length;
 }
 
 export interface AccountSummary {
@@ -158,6 +258,7 @@ export function toAccountDto(account: schema.Account) {
     currency: account.currency,
     initialCapital: money(account.initialCapital) ?? "0",
     isActive: account.isActive,
+    deletedAt: account.deletedAt,
     createdAt: account.createdAt,
     updatedAt: account.updatedAt,
   };

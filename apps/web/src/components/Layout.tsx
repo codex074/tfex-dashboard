@@ -3,6 +3,7 @@ import { NavLink, Outlet } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import { persistLanguage } from "../i18n";
 import { LanguageSwitcher } from "./LanguageSwitcher";
+import { AccountSwitcher } from "./AccountSwitcher";
 import { useAuth } from "../auth/AuthContext";
 
 interface NavItem {
@@ -85,6 +86,9 @@ export function Layout() {
         </nav>
 
         <div className="mt-auto border-t border-hairline-soft p-3">
+          <div className="mb-2 lg:hidden lg:group-hover:block">
+            <AccountSwitcher />
+          </div>
           <div className="mb-2 overflow-hidden rounded-xl bg-surface-soft px-3 py-2 lg:hidden lg:group-hover:block">
             <p className="truncate text-xs font-bold text-ink">{user?.displayName}</p>
             <p className="truncate text-[11px] text-stone">{user?.role}</p>
@@ -127,6 +131,9 @@ export function Layout() {
           className="h-7 w-7 rounded-lg object-cover"
         />
         <span className="text-sm font-bold text-ink-deep">{t("appName")}</span>
+        <div className="ml-auto">
+          <AccountSwitcher />
+        </div>
       </header>
 
       <div className="lg:pl-[76px]">

@@ -6,6 +6,7 @@ import "./index.css";
 import { initI18n } from "./i18n";
 import App from "./App";
 import { AuthProvider } from "./auth/AuthContext";
+import { AccountProvider } from "./auth/AccountContext";
 
 initI18n();
 
@@ -21,7 +22,13 @@ const queryClient = new QueryClient({
 ReactDOM.createRoot(document.getElementById("root")!).render(
   <React.StrictMode>
     <QueryClientProvider client={queryClient}>
-      <AuthProvider><BrowserRouter><App /></BrowserRouter></AuthProvider>
+      <AuthProvider>
+        <AccountProvider>
+          <BrowserRouter>
+            <App />
+          </BrowserRouter>
+        </AccountProvider>
+      </AuthProvider>
     </QueryClientProvider>
   </React.StrictMode>,
 );

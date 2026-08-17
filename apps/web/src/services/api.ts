@@ -89,6 +89,7 @@ export interface Account {
   currency: string;
   initialCapital: string;
   isActive: boolean;
+  deletedAt: string | null;
   createdAt: string;
   updatedAt: string;
 }

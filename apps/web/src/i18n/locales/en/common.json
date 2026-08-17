@@ -86,12 +86,20 @@
   "settings": { "title": "Settings", "myDefaults": "My defaults", "myDefaultsHelp": "Select the brokers and instruments you use. Your choices populate transaction dropdowns.", "saveDefaults": "Save defaults", "saved": "Saved", "adminArea": "Admin settings", "members": "Members", "membersHelp": "Create member accounts and assign roles.", "role": "Role", "addMember": "Add member", "instruments": "Instruments", "instrumentsHelp": "Manage instruments users can select, such as S50 and GO.", "instrumentCode": "Instrument code", "instrumentName": "Instrument name", "addInstrument": "Add instrument", "contractSpecs": "Contract specs", "contractHelp": "Set the multiplier, tick size, and margin rates for each instrument.", "brokerTerms": "Broker terms", "brokerHelp": "Set margin and fee defaults per broker.", "instrumentFamily": "Instrument", "multiplier": "THB per point", "tickSize": "Tick size", "initialMarginRate": "Initial margin rate (%)", "maintenanceMarginRate": "Maintenance margin rate (%)", "effectiveDate": "Effective from", "broker": "Broker", "selectBroker": "Select broker", "initialMargin": "Initial margin", "maintenanceMargin": "Maintenance margin", "commission": "Commission", "pending": "Pending activation", "activate": "Activate" },
   "account": {
     "title": "Trading account",
-    "help": "Create your trading account to start recording trades.",
+    "help": "Create and manage your trading accounts.",
     "name": "Account name",
     "accountNumber": "Account number",
     "initialCapital": "Initial capital (THB)",
     "create": "Create account",
-    "creating": "Creating…"
+    "creating": "Creating…",
+    "noAccounts": "No trading accounts yet.",
+    "delete": "Delete",
+    "deleting": "Deleting…",
+    "deleteConfirm": "Delete account \"{{name}}\"? It can be restored within 24 hours.",
+    "deletedAccounts": "Recently deleted",
+    "restore": "Restore",
+    "restoring": "Restoring…",
+    "restoreIn": "Deletes permanently in {{time}}"
   },
   "brokers": {
     "title": "Brokers",

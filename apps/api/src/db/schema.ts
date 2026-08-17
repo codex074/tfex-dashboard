@@ -149,6 +149,9 @@ export const accounts = sqliteTable(
     // Integer satang (initial capital contribution).
     initialCapital: integer("initial_capital").notNull().default(0),
     isActive: integer("is_active", { mode: "boolean" }).notNull().default(true),
+    // Soft-delete marker. NULL means the account is live. Non-null marks the
+    // account as pending deletion; the row is purged after the 24h grace window.
+    deletedAt: text("deleted_at"),
     ...timestamps,
   },
   (table) => ({

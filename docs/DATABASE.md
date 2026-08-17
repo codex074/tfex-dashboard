@@ -62,3 +62,11 @@ Uses the SQLite online backup API (WAL-safe), writing to `backups/tfex-YYYY-MM-D
 - Never delete financial records without confirmation.
 - Never merge uncertain trades automatically.
 - Capital flow stays separate from trading performance.
+
+## Account deletion
+
+Accounts are soft-deleted: `accounts.deleted_at` is set and the row is hidden
+from the live account list. The account can be restored within a 24-hour grace
+window (`POST /api/accounts/:id/restore`). After the window elapses the row is
+physically purged (cascade deletion of its transactions, trades, positions,
+snapshots and journals) the next time deleted accounts are listed.

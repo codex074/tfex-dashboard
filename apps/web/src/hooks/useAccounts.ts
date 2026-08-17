@@ -8,7 +8,4 @@ export function useAccounts() {
   });
 }
 
-export function useActiveAccountId(): number | undefined {
-  const { data } = useAccounts();
-  return data?.[0]?.id;
-}
+export { useActiveAccountId } from "../auth/AccountContext";

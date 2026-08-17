@@ -250,6 +250,7 @@ export function migrate() {
       "ALTER TABLE trades ADD COLUMN broker_id INTEGER REFERENCES brokers(id) ON DELETE SET NULL",
       "ALTER TABLE accounts ADD COLUMN user_id INTEGER REFERENCES users(id) ON DELETE CASCADE",
       "CREATE INDEX IF NOT EXISTS accounts_user_idx ON accounts (user_id)",
+      "ALTER TABLE accounts ADD COLUMN deleted_at TEXT",
       "ALTER TABLE instrument_contract_specs ADD COLUMN initial_margin_rate_bps INTEGER",
       "ALTER TABLE instrument_contract_specs ADD COLUMN maintenance_margin_rate_bps INTEGER",
     ]) {

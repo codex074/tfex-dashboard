@@ -2,12 +2,23 @@ import { type FormEvent, type ReactNode, useEffect, useState } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useTranslation } from "react-i18next";
 import { useAuth } from "../auth/AuthContext";
-import { api, type Broker, type BrokerContractTerm, type Instrument, type InstrumentContractSpec, type UserPreferences } from "../services/api";
+import { api, type Account, type Broker, type BrokerContractTerm, type Instrument, type InstrumentContractSpec, type UserPreferences } from "../services/api";
 import { PageTitle, SearchableCheckboxGroup } from "../components/ui";
+import { useAccounts } from "../hooks/useAccounts";
 
 const input = "mt-1 w-full rounded-xl border border-hairline-soft px-3 py-2 text-sm";
 const today = () => new Date().toISOString().slice(0, 10);
 const tones = { account: "bg-gradient-to-br from-ink-deep to-primary-deep text-canvas", brokers: "bg-violet-soft text-ink-deep", specs: "bg-sky-soft text-ink-deep", terms: "bg-amber-soft text-ink-deep" } as const;
+
+function formatRemaining(deletedAt: string, now: number): string {
+  const ms = Date.parse(deletedAt) + 24 * 60 * 60 * 1000 - now;
+  if (ms <= 0) return "—";
+  const totalMinutes = Math.max(0, Math.round(ms / 60000));
+  const hours = Math.floor(totalMinutes / 60);
+  const minutes = totalMinutes % 60;
+  if (hours >= 1) return `${hours}h ${minutes}m`;
+  return `${minutes}m`;
+}
 
 export function SettingsPage() {
   const { t } = useTranslation();
@@ -31,7 +42,11 @@ export function SettingsPage() {
   useEffect(() => { if (preferences.data) { setSelectedBrokers(preferences.data.brokers.map((x) => x.id)); setSelectedInstruments(preferences.data.instruments.map((x) => x.id)); } }, [preferences.data]);
 
   const savePreferences = useMutation({ mutationFn: () => api.put<UserPreferences>("/me/preferences", { brokerIds: selectedBrokers, instrumentIds: selectedInstruments }), onSuccess: () => void qc.invalidateQueries({ queryKey: ["my-preferences"] }) });
-  const createAccount = useMutation({ mutationFn: () => api.post("/accounts", { name: account.name.trim(), accountNumber: account.accountNumber.trim() || null, initialCapital: account.initialCapital }), onSuccess: () => { void qc.invalidateQueries({ queryKey: ["accounts"] }); setAccount({ name: "", accountNumber: "", initialCapital: "0" }); } });
+  const accounts = useAccounts();
+  const deletedAccounts = useQuery({ queryKey: ["deleted-accounts"], queryFn: () => api.get<Account[]>("/accounts/deleted") });
+  const createAccount = useMutation({ mutationFn: () => api.post("/accounts", { name: account.name.trim(), accountNumber: account.accountNumber.trim() || null, initialCapital: account.initialCapital }), onSuccess: () => { void qc.invalidateQueries({ queryKey: ["accounts"] }); void qc.invalidateQueries({ queryKey: ["deleted-accounts"] }); setAccount({ name: "", accountNumber: "", initialCapital: "0" }); } });
+  const deleteAccount = useMutation({ mutationFn: (id: number) => api.delete(`/accounts/${id}`), onSuccess: () => { void qc.invalidateQueries({ queryKey: ["accounts"] }); void qc.invalidateQueries({ queryKey: ["deleted-accounts"] }); } });
+  const restoreAccount = useMutation({ mutationFn: (id: number) => api.post(`/accounts/${id}/restore`), onSuccess: () => { void qc.invalidateQueries({ queryKey: ["accounts"] }); void qc.invalidateQueries({ queryKey: ["deleted-accounts"] }); } });
   const createBroker = useMutation({ mutationFn: () => api.post("/brokers", broker), onSuccess: () => { void qc.invalidateQueries({ queryKey: ["brokers"] }); setBroker({ name: "", shortName: "" }); } });
   const createInstrument = useMutation({ mutationFn: () => api.post("/instruments", instrument), onSuccess: () => { void qc.invalidateQueries({ queryKey: ["instruments"] }); setInstrument({ code: "", name: "" }); } });
   const saveSpec = useMutation({ mutationFn: () => api.post("/instrument-contract-specs", { ...spec, initialMarginRate: spec.initialMarginRate || null, maintenanceMarginRate: spec.maintenanceMarginRate || null }), onSuccess: () => void qc.invalidateQueries({ queryKey: ["contract-specs"] }) });
@@ -53,6 +68,44 @@ export function SettingsPage() {
           <Label text={t("account.initialCapital")}><input className={input} type="number" min="0" step="0.01" value={account.initialCapital} onChange={(e) => setAccount({ ...account, initialCapital: e.target.value })} required /></Label>
           <Submit mutation={createAccount} className="md:col-span-3" label={t("account.create")} loading={t("account.creating")} />
         </form>
+
+        <div className="mt-6 space-y-2">
+          {(accounts.data ?? []).length === 0 ? (
+            <p className="text-sm text-slate">{t("account.noAccounts")}</p>
+          ) : (
+            (accounts.data ?? []).map((a) => (
+              <div key={a.id} className="flex items-center justify-between gap-3 rounded-xl border border-hairline-soft px-3 py-2">
+                <span className="text-sm text-ink">
+                  {a.name}
+                  {a.accountNumber ? <span className="text-stone"> · {a.accountNumber}</span> : null}
+                </span>
+                <button type="button" className="rounded-full bg-critical-soft px-3 py-1 text-xs font-bold text-critical" disabled={deleteAccount.isPending} onClick={() => { if (window.confirm(t("account.deleteConfirm", { name: a.name }))) deleteAccount.mutate(a.id); }}>
+                  {t("account.delete")}
+                </button>
+              </div>
+            ))
+          )}
+        </div>
+
+        {(deletedAccounts.data ?? []).length > 0 ? (
+          <div className="mt-6">
+            <h3 className="mb-2 text-sm font-bold text-ink">{t("account.deletedAccounts")}</h3>
+            <div className="space-y-2">
+              {(deletedAccounts.data ?? []).map((a) => (
+                <div key={a.id} className="flex items-center justify-between gap-3 rounded-xl border border-hairline-soft bg-surface-soft px-3 py-2">
+                  <span className="text-sm text-stone">
+                    {a.name}
+                    {a.accountNumber ? ` · ${a.accountNumber}` : ""}
+                    <span className="ml-2 text-xs"> · {t("account.restoreIn", { time: a.deletedAt ? formatRemaining(a.deletedAt, Date.now()) : "—" })}</span>
+                  </span>
+                  <button type="button" className="rounded-full bg-ink-deep px-3 py-1 text-xs font-bold text-canvas" disabled={restoreAccount.isPending} onClick={() => restoreAccount.mutate(a.id)}>
+                    {restoreAccount.isPending ? t("account.restoring") : t("account.restore")}
+                  </button>
+                </div>
+              ))}
+            </div>
+          </div>
+        ) : null}
       </Card>
     </div>
 

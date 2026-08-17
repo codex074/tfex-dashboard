@@ -86,12 +86,20 @@
   "settings": { "title": "ตั้งค่า", "myDefaults": "ค่าเริ่มต้นของฉัน", "myDefaultsHelp": "เลือก Broker และสินทรัพย์ที่คุณใช้งาน ตัวเลือกที่เลือกจะปรากฏใน Dropdown ตอนบันทึกธุรกรรม", "saveDefaults": "บันทึกค่าเริ่มต้น", "saved": "บันทึกแล้ว", "adminArea": "การตั้งค่าสำหรับ Admin", "members": "สมาชิก", "membersHelp": "สร้างบัญชีผู้ใช้และกำหนดสิทธิ์", "role": "สิทธิ์", "addMember": "เพิ่มสมาชิก", "instruments": "รายการสินทรัพย์", "instrumentsHelp": "จัดการสินทรัพย์ที่ผู้ใช้เลือกได้ เช่น S50 และ GO", "instrumentCode": "รหัสสินทรัพย์", "instrumentName": "ชื่อสินทรัพย์", "addInstrument": "เพิ่มสินทรัพย์", "contractSpecs": "สเปกสัญญา", "contractHelp": "กำหนด multiplier, tick size และอัตราเงินประกันของสินทรัพย์", "brokerTerms": "เงื่อนไข Broker", "brokerHelp": "กำหนดเงินประกันและค่าธรรมเนียมตาม Broker", "instrumentFamily": "สินทรัพย์", "multiplier": "บาทต่อจุด", "tickSize": "Tick size", "initialMarginRate": "อัตราเงินประกันเริ่มต้น (%)", "maintenanceMarginRate": "อัตราเงินประกันรักษาสถานะ (%)", "effectiveDate": "มีผลตั้งแต่", "broker": "Broker", "selectBroker": "เลือก Broker", "initialMargin": "เงินประกันเริ่มต้น", "maintenanceMargin": "เงินประกันรักษาสถานะ", "commission": "Commission", "pending": "รออนุมัติ", "activate": "เปิดใช้งาน" },
   "account": {
     "title": "บัญชีเทรด",
-    "help": "สร้างบัญชีเทรดของคุณเพื่อเริ่มบันทึกการเทรด",
+    "help": "สร้างและจัดการบัญชีเทรดของคุณ",
     "name": "ชื่อบัญชี",
     "accountNumber": "เลขที่บัญชี",
     "initialCapital": "เงินทุนเริ่มต้น (บาท)",
     "create": "สร้างบัญชี",
-    "creating": "กำลังสร้าง…"
+    "creating": "กำลังสร้าง…",
+    "noAccounts": "ยังไม่มีบัญชีเทรด",
+    "delete": "ลบ",
+    "deleting": "กำลังลบ…",
+    "deleteConfirm": "ลบบัญชี \"{{name}}\"? คุณสามารถกู้คืนได้ภายใน 24 ชั่วโมง",
+    "deletedAccounts": "ลบล่าสุด",
+    "restore": "กู้คืน",
+    "restoring": "กำลังกู้คืน…",
+    "restoreIn": "จะลบถาวรใน {{time}}"
   },
   "brokers": {
     "title": "Brokers",

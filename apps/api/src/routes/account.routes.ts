@@ -8,7 +8,10 @@ import type { Db } from "../db/client.js";
 import {
   accountSummary,
   createAccount,
+  deleteAccount,
   listAccounts,
+  listDeletedAccounts,
+  restoreAccount,
   toAccountDto,
 } from "../services/account.service.js";
 import {
@@ -37,6 +40,22 @@ export function registerAccountRoutes(app: FastifyInstance, db: Db) {
     const { id } = request.params as { id: string };
     const accountId = Number(id);
     return { data: accountSummary(db, accountId) };
+  });
+
+  app.get("/api/accounts/deleted", async (request) => {
+    const user = requireUser(request);
+    return { data: listDeletedAccounts(db, user.role === "ADMIN" ? undefined : user.id).map(toAccountDto) };
+  });
+
+  app.delete("/api/accounts/:id", async (request) => {
+    const { id } = request.params as { id: string };
+    // Soft delete: the row is preserved and can be restored within 24h.
+    return { data: toAccountDto(deleteAccount(db, Number(id))) };
+  });
+
+  app.post("/api/accounts/:id/restore", async (request) => {
+    const { id } = request.params as { id: string };
+    return { data: toAccountDto(restoreAccount(db, Number(id))) };
   });
 
   app.get("/api/accounts/:id/cash-flows", async (request) => {
