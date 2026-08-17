@@ -80,3 +80,47 @@ button:disabled {
 #root {
   min-height: 100vh;
 }
+
+/* SweetAlert2 theme — match the app's clean, rounded, trading-focused look. */
+.swal2-popup {
+  border-radius: var(--radius-xxxl);
+  background: var(--color-canvas);
+  color: var(--color-ink-deep);
+  font-family: var(--font-sans);
+  box-shadow: 0 24px 60px rgba(10, 19, 23, 0.18);
+  border: 1px solid var(--color-hairline-soft);
+  padding: 2rem;
+}
+
+.swal2-title {
+  color: var(--color-ink-deep);
+  font-weight: 600;
+  letter-spacing: -0.01em;
+}
+
+.swal2-html-container {
+  color: var(--color-slate);
+}
+
+.swal2-icon.swal2-warning {
+  border-color: var(--color-attention);
+  color: var(--color-attention);
+}
+
+.swal2-icon.swal2-question {
+  border-color: var(--color-primary);
+  color: var(--color-primary);
+}
+
+.swal2-styled {
+  border-radius: 9999px;
+  font-weight: 700;
+  font-size: 0.875rem;
+  padding: 0.65rem 1.5rem;
+  box-shadow: none;
+}
+
+.swal2-styled.swal2-confirm:focus,
+.swal2-styled.swal2-cancel:focus {
+  box-shadow: 0 0 0 3px var(--color-hairline-soft);
+}
