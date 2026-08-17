@@ -15,6 +15,7 @@
     "db:generate": "pnpm --filter @tfex/api db:generate",
     "db:migrate": "pnpm --filter @tfex/api db:migrate",
     "db:seed": "pnpm --filter @tfex/api db:seed",
+    "db:seed:reference": "pnpm --filter @tfex/api db:seed:reference",
     "backup": "pnpm --filter @tfex/api backup"
   },
   "packageManager": "pnpm@11.7.0",

@@ -29,3 +29,16 @@ export function price(value: number | null | undefined): string | null {
 export function priceOrZero(value: number | null | undefined): string {
   return pointsIntToPriceString(value ?? 0);
 }
+
+/** Convert integer basis points to a decimal percentage string ("8.5"). */
+export function bpsToPercentString(
+  value: number | null | undefined,
+): string | null {
+  if (value === null || value === undefined) {
+    return null;
+  }
+  const whole = Math.trunc(value / 10_000);
+  const frac = Math.abs(value % 10_000);
+  const fracStr = frac.toString().padStart(4, "0").replace(/0+$/, "");
+  return fracStr ? `${whole}.${fracStr}` : `${whole}`;
+}

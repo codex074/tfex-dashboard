@@ -83,7 +83,15 @@ export const userInstruments = sqliteTable(
   (table) => ({ userInstrumentsPk: primaryKey({ columns: [table.userId, table.instrumentId] }) }),
 );
 
-/** Exchange-level contract terms; values are versioned by effective date. */
+/**
+ * Exchange-level contract terms; values are versioned by effective date.
+ *
+ * `multiplierSatangPerPoint` is the THB (integer satang) value of a one-point
+ * price move for one contract. Margin rates are stored as integer basis points
+ * (1% = 100 bps) because the Thailand Clearing House publishes margin as a
+ * percentage of contract value, recomputed daily from the underlying price.
+ * Effective leverage is derived (10_000 / initialMarginRateBps), never stored.
+ */
 export const instrumentContractSpecs = sqliteTable(
   "instrument_contract_specs",
   {
@@ -91,6 +99,8 @@ export const instrumentContractSpecs = sqliteTable(
     instrumentFamily: text("instrument_family").notNull(),
     multiplierSatangPerPoint: integer("multiplier_satang_per_point").notNull(),
     tickSizePoints: integer("tick_size_points").notNull().default(10),
+    initialMarginRateBps: integer("initial_margin_rate_bps"),
+    maintenanceMarginRateBps: integer("maintenance_margin_rate_bps"),
     effectiveDate: text("effective_date").notNull(),
     isActive: integer("is_active", { mode: "boolean" }).notNull().default(true),
     ...timestamps,
