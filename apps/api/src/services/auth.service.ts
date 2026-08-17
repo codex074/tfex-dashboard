@@ -100,6 +100,20 @@ export function updateUser(
   return toUserDto(updated);
 }
 
+/**
+ * Resets a user's password to a new random temporary password (admin-only).
+ * Invalidates all of the user's existing sessions so they must sign in again
+ * with the returned temporary password.
+ */
+export function resetUserPassword(db: Db, userId: number): string {
+  const target = db.select({ id: schema.users.id }).from(schema.users).where(eq(schema.users.id, userId)).get();
+  if (!target) throw errors.notFound("User");
+  const temporaryPassword = randomBytes(9).toString("base64url");
+  db.update(schema.users).set({ passwordHash: hashPassword(temporaryPassword) }).where(eq(schema.users.id, userId)).run();
+  db.delete(schema.authSessions).where(eq(schema.authSessions.userId, userId)).run();
+  return temporaryPassword;
+}
+
 export function createSession(db: Db, email: string, password: string) {
   const user = db.select().from(schema.users).where(eq(schema.users.email, email)).get();
   if (!user || !user.isActive || !verifyPassword(password, user.passwordHash)) {

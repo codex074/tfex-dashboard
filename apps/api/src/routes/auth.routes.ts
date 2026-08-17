@@ -3,7 +3,7 @@ import { createUserSchema, loginSchema, registerUserSchema, updateUserPreference
 import type { Db } from "../db/client.js";
 import { errors } from "../lib/errors.js";
 import { rateLimit } from "../lib/rateLimit.js";
-import { createSession, createUser, deleteSession, getUserPreferences, listUsers, toUserDto, updateUser, updateUserPreferences, userCount, type AuthUser } from "../services/auth.service.js";
+import { createSession, createUser, deleteSession, getUserPreferences, listUsers, resetUserPassword, toUserDto, updateUser, updateUserPreferences, userCount, type AuthUser } from "../services/auth.service.js";
 
 declare module "fastify" {
   interface FastifyRequest { authUser?: AuthUser; authToken?: string }
@@ -61,6 +61,12 @@ export function registerAuthRoutes(app: FastifyInstance, db: Db) {
     requireAdmin(request);
     const input = updateUserSchema.parse(request.body);
     return { data: updateUser(db, Number(request.params.id), input) };
+  });
+
+  app.post<{ Params: { id: string } }>("/api/admin/users/:id/reset-password", async (request) => {
+    requireAdmin(request);
+    const temporaryPassword = resetUserPassword(db, Number(request.params.id));
+    return { data: { temporaryPassword } };
   });
 
   app.get("/api/me/preferences", async (request) => ({ data: getUserPreferences(db, requireUser(request).id) }));

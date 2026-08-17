@@ -12,6 +12,7 @@ export function AdminUsersPage() {
   const { user: currentUser } = useAuth();
   const qc = useQueryClient();
   const [member, setMember] = useState({ displayName: "", email: "", password: "", role: "USER" });
+  const [resetResult, setResetResult] = useState<{ email: string; password: string } | null>(null);
 
   const users = useQuery({ queryKey: ["admin-users"], queryFn: () => api.get<AuthUser[]>("/admin/users") });
 
@@ -28,9 +29,23 @@ export function AdminUsersPage() {
     onSuccess: () => void qc.invalidateQueries({ queryKey: ["admin-users"] }),
   });
 
+  const resetPassword = useMutation({
+    mutationFn: (id: number) => api.post<{ temporaryPassword: string }>(`/admin/users/${id}/reset-password`),
+    onSuccess: (data, id) => {
+      const target = (users.data ?? []).find((u) => u.id === id);
+      if (target) setResetResult({ email: target.email, password: data.temporaryPassword });
+    },
+  });
+
   function submit(event: FormEvent) {
     event.preventDefault();
     createMember.mutate();
+  }
+
+  function confirmReset(id: number, email: string) {
+    if (window.confirm(t("users.resetConfirm", { email }))) {
+      resetPassword.mutate(id);
+    }
   }
 
   if (users.isLoading) return <Loading label={t("common.loading")} />;
@@ -45,6 +60,19 @@ export function AdminUsersPage() {
         subtitle={t("users.subtitle")}
         actions={<span className="rounded-full bg-surface-soft px-3 py-1 text-xs font-bold text-steel">{list.length}</span>}
       />
+
+      {resetResult ? (
+        <section className="rounded-xxxl border border-attention-soft bg-attention-soft p-6">
+          <div className="flex flex-wrap items-start justify-between gap-4">
+            <div>
+              <p className="text-sm font-bold text-ink-deep">{t("users.resetTitle")}</p>
+              <p className="mt-1 text-sm text-ink">{t("users.resetHelp", { email: resetResult.email })}</p>
+            </div>
+            <button type="button" className="rounded-full border border-hairline-soft px-4 py-1.5 text-sm font-bold text-ink transition-colors hover:bg-canvas" onClick={() => setResetResult(null)}>{t("users.resetDismiss")}</button>
+          </div>
+          <code className="mt-3 inline-block rounded-xl bg-canvas px-4 py-2 font-mono text-base text-ink-deep">{resetResult.password}</code>
+        </section>
+      ) : null}
 
       <section className="overflow-hidden rounded-xxxl border border-hairline-soft bg-canvas">
         <div className="border-b border-hairline-soft px-6 py-5">
@@ -119,15 +147,25 @@ export function AdminUsersPage() {
                       </Badge>
                     </td>
                     <td className="px-6 py-3">
-                      <button
-                        type="button"
-                        className="inline-flex items-center gap-1 rounded-full border border-hairline-soft px-3 py-1 text-xs font-bold text-ink transition-colors hover:bg-surface-soft disabled:opacity-60"
-                        disabled={busy}
-                        onClick={() => updateMember.mutate({ id: u.id, body: { isActive: !u.isActive } })}
-                      >
-                        {busy ? t("auth.saving") : u.isActive ? t("users.deactivate") : t("users.activate")}
-                        {isSelf ? <span className="text-stone">· {t("users.you")}</span> : null}
-                      </button>
+                      <div className="flex flex-wrap items-center gap-2">
+                        <button
+                          type="button"
+                          className="inline-flex items-center gap-1 rounded-full border border-hairline-soft px-3 py-1 text-xs font-bold text-ink transition-colors hover:bg-surface-soft disabled:opacity-60"
+                          disabled={busy}
+                          onClick={() => updateMember.mutate({ id: u.id, body: { isActive: !u.isActive } })}
+                        >
+                          {busy ? t("auth.saving") : u.isActive ? t("users.deactivate") : t("users.activate")}
+                          {isSelf ? <span className="text-stone">· {t("users.you")}</span> : null}
+                        </button>
+                        <button
+                          type="button"
+                          className="inline-flex items-center gap-1 rounded-full border border-hairline-soft px-3 py-1 text-xs font-bold text-ink transition-colors hover:bg-attention-soft disabled:opacity-60"
+                          disabled={resetPassword.isPending && resetPassword.variables === u.id}
+                          onClick={() => confirmReset(u.id, u.email)}
+                        >
+                          {resetPassword.isPending && resetPassword.variables === u.id ? t("auth.saving") : t("users.resetPassword")}
+                        </button>
+                      </div>
                     </td>
                   </tr>
                 );
